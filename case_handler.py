@@ -53,8 +53,9 @@ def talk_to_ollama(user_input,model,ollama_url):
         return f"Network error: {e}"
 
 # Function to interact with GPT-4 API
-def talk_to_gpt4(user_input,model,ollama_url):
+def talk_to_gpt4(user_input,model,url):
     global context
+    openai.api_key= url
     # Add the user input to the context
     context.append({"role": "user", "content": user_input})
 
@@ -80,7 +81,7 @@ def talk_to_gpt4(user_input,model,ollama_url):
         return f"API error: {e}"
 
 # Function to switch between Ollama and GPT-4
-def talk_to_gino(user_input, model_type="ollama"):
+def talk_to_gino(user_input, model_type="ollama",url):
     if model_type == "ollama":
         return talk_to_ollama(user_input)
     elif model_type == "gpt-4":
