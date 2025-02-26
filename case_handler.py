@@ -65,7 +65,7 @@ def talk_to_gpt4(user_input,model,url):
     # Prepare the request for GPT-4
     try:
         response = openai.ChatCompletion.create(
-            model="gpt-4",  # Use GPT-4 model
+            model=model,  # Use GPT-4 model
             messages=context  # Send the full context for multi-turn conversation
         )
 
@@ -80,12 +80,14 @@ def talk_to_gpt4(user_input,model,url):
         # Handle OpenAI API errors
         return f"API error: {e}"
 
-# Function to switch between Ollama and GPT-4
-def talk_to_gino(user_input, model_type="ollama",url):
+# Function to switch between Models
+def talk_to_gino(user_input, model_type=ollama,url):
     if model_type == "ollama":
-        return talk_to_ollama(user_input)
+        return talk_to_ollama(user_input, model_type, url)
     elif model_type == "gpt-4":
-        return talk_to_gpt4(user_input)
+        return talk_to_gpt4(user_input, model_type, url)
     else:
         return "Error: Invalid model choice."
+    
+
 
