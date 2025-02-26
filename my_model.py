@@ -10,7 +10,9 @@ import openai
 
 MAX_CONTEXT_LENGTH = 50  # Adjust as needed
 HEADERS = {"Content-Type": "application/json"}
+# safe words
 SYS_ROLE = ("sysrole", "sys_role")
+EXT = "exitnow"
 
 class GinoChat:
     def __init__(self, max_context_length=MAX_CONTEXT_LENGTH, model="mistral", api_key=None):
@@ -23,8 +25,12 @@ class GinoChat:
 
     # Update the conversation context and enforce size limits in one step.
     def update_context(self, role, content):
-        if any( word in content[-1]["content"].lower() for word in SYS_ROLE) and "assistant" not in role
+        if any( word in content[-1]["content"].lower() for word in SYS_ROLE) and "assistant" not in role:
             role = "system"
+            for word in SYS_ROLE:
+                content[-1]["content"] = content[-1]["content"].replace(word, "")
+            content[-1]["content"] = content[-1]["content"].strip()
+
         self.context.append({"role": role, "content": content})
         self.context = self.context[-self.max_context_length:]  # Keep only the last N messages
 

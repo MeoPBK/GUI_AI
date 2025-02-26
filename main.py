@@ -17,19 +17,10 @@ context = ["You are a useful assistant that answers my questions!",
            "You are a deeplearning, machine learning and control engineer.",
            "Always double check your sources, quote them and base your deductions on scientific papers"]
 
-# safe words
-EXT = "exitnow" 
-SYS_ROLE = "sysrole"  # how do i make it better??
-
 gino = GinoChat(api_key=OLLAMA_URL)  # Pass API key at initialization
 
 while True:
     user_input = input("You: ")
-        
-    if SYS_ROLE in user_input.lower():     
-        context.append({"role": "system", "content": user_input})
-    else:
-        context.append({"role": "user", "content": user_input})
 
     model_response = gino.talk_to_gino(user_input, model_type=MODEL, url=OLLAMA_URL)
     print("Model:", model_response)
@@ -38,3 +29,4 @@ while True:
         context.append({"role": "system", "content": user_input})
         break
     
+gino.close()
