@@ -82,9 +82,9 @@ class GinoChat:
             return f"OpenAI API Error: {e}"
 
     # Choose the model to communicate with.
-    def talk_to_gino(self, user_input, model_type="ollama", url=None):
-        if "deepseek"  in model_type.lower() or "ollama" in model_type.lower():
-            return self.talk_to_ollama(user_input, model=model_type, ollama_url=url)
+    def talk_to_gino(self, user_input, model_type="ollama", url="ollama"):
+        if "deepseek"  in model_type.lower() or "mistral" in model_type.lower():
+            return self.talk_to_ollama(user_input, model=model_type, api_key=url)
         elif "gpt" in model_type.lower():
             return self.talk_to_gpt(user_input, model=model_type, api_key=url)
         else:
