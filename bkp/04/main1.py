@@ -1,6 +1,6 @@
 from flask import Flask, render_template
 from flask_socketio import SocketIO, send, emit
-from OllamaComm import OllamaPOST
+from OllamaComm import OllamaPOST, GetAvailableModels
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'sdifjansovkjdsnfvasnxlvmnskdjknvsv'
@@ -15,7 +15,7 @@ chat_messages = []
 
 # Initialize the Ollama communication instances
 Ollama = OllamaPOST()
-OllamaModels = OllamaPOST()
+OllamaModels = GetAvailableModels()
 
 @app.route('/')
 def index():
@@ -75,7 +75,7 @@ def handle_change_model(data):
     address = data.get('address', OLLAMA_URL)
     
     # Send confirmation message
-    #send({"sender": "system", "message": f"Model changed to {model}"}, broadcast=True)
+    send({"sender": "system", "message": f"Model changed to {model}"}, broadcast=True)
 
 @socketio.on('send_message')
 def handle_send_message(data):

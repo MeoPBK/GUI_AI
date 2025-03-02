@@ -19,19 +19,18 @@ OllamaData = {
         "stream": False             #come compilarlo: imposta a true se vuoi ricevere la risposta in parti, oppure a false se vuoi riceverla tutta in una volta
 }
 
+def clean_response(response):
+    """
+    Rimuove il contenuto tra i tag <think> e </think> dalla risposta.
+    """
+    # Usa una regex per trovare e rimuovere tutto ciò che è tra <think> e </think>
+    cleaned_response = re.sub(r'<think>.*?</think>', '', response, flags=re.DOTALL)
+    return cleaned_response.strip()  # Rimuove spazi bianchi extra
 
 
 class OllamaPOST:
         def __init__(self):
             self.session = requests.Session()  # Persistent session for efficiency
-        
-        def clean_response(self, response):
-            """
-            Rimuove il contenuto tra i tag <think> e </think> dalla risposta.
-            """
-            # Usa una regex per trovare e rimuovere tutto ciò che è tra <think> e </think>
-            cleaned_response = re.sub(r'<think>.*?</think>', '', response, flags=re.DOTALL)
-            return cleaned_response.strip()  # Rimuove spazi bianchi extra
 
         def talk_to_ollama(self, user_input, model="deepseek-r1:14b", api_key="http://localhost:11434"):
 
@@ -45,11 +44,15 @@ class OllamaPOST:
                 response.raise_for_status()
                 response_data = response.json()
                 model_output = response_data.get('response', 'No response received.')
-                cleaned_output = self.clean_response(model_output)
+                cleaned_output = clean_response(model_output)
                 return cleaned_output
             
             except requests.exceptions.RequestException as e:
                 return f"API Error: {e}"
+
+class GetAvailableModels:
+        def __init__(self):
+            self.session = requests.Session()  # Persistent session for efficiency
 
         def get_ollama_models(self, api_key="http://localhost:11434"):
             try:
