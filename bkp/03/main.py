@@ -41,7 +41,7 @@ def handle_get_models():
 def handle_send_message(data):
     """Handle sending a message and getting the model's response."""
     user_message = data['message']
-    model        = data['model']
+    #model = data.get('model')
 
     # Store the user's message in the chat history
     chat_messages.append({"sender": "user", "message": user_message})
@@ -50,7 +50,7 @@ def handle_send_message(data):
     send({"sender": "user", "message": user_message}, broadcast=True)
 
     # Get the model's response using GinoeasyChat
-    model_response = Ollama.talk_to_ollama(user_message, model, OLLAMA_URL)
+    model_response = Ollama.talk_to_ollama(user_message, MODEL, OLLAMA_URL)
 
     # Store the model's response in the chat history
     chat_messages.append({"sender": "ai", "message": model_response})
