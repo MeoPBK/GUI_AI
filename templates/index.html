@@ -44,7 +44,7 @@
             text-align: right;
             font-size: 0.8rem;
             font-weight: bold;
-            color: #ffffff;
+            color: #000000;
             border-bottom: 1px solid #444;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
             cursor: move; /* Cambia il cursore per indicare che è trascinabile */
@@ -91,7 +91,7 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 500px;
+            width: 450px;
             background-color: #2a2a2a;
             border-radius: 15px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
@@ -101,12 +101,24 @@
 
         .settings-header {
             font-weight: bold;
-            color: #3a3a3a;
-            margin-bottom: 10px;
+            color: #555555;
+            margin-bottom: 2px;
+        }
+        
+        .open-settings   {
+            color: #232323;
+            background: transparent;
+            border: none;
+            font-size: 1.5rem;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
         }
 
+
         .settings-close {
-            color: #3a3a3a;
+            color: #000000;
             background: transparent;
             border: none;
             font-size: 1.5rem;
