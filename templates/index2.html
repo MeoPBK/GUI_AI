@@ -84,76 +84,7 @@
 
         }
 
-        /* Settings Window */
-        .settings-window {
-            display: none; /* Hidden by default */
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 500px;
-            background-color: #2a2a2a;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            padding: 20px;
-            z-index: 10;
-        }
-
-        .settings-header {
-            font-weight: bold;
-            color: #3a3a3a;
-            margin-bottom: 10px;
-        }
-
-        .settings-close {
-            color: #3a3a3a;
-            background: transparent;
-            border: none;
-            font-size: 1.5rem;
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            cursor: pointer;
-        }
-
-        .control-selectors {
-            margin-top: 10px;
-        }
-
-        .control-selectors label {
-            font-size: 0.8rem;
-            color: #ffffff;
-        }
-
-        .control-selectors select,
-        .control-selectors input {
-            padding: 5px 10px;
-            border: 2px solid #4a4a4a;
-            border-radius: 8px;
-            background-color: #2a2a2a;
-            color: #ffffff;
-            font-size: 0.8rem;
-            transition: all 0.3s ease;
-        }
-
-        .control-selectors select {
-            cursor: pointer;
-        }
-
-        .control-selectors select:hover,
-        .control-selectors input:hover {
-            border-color: #5a5a5a;
-        }
-
-        .control-selectors select:focus,
-        .control-selectors input:focus {
-            outline: none;
-            border-color: #6a6a6a;
-        }
-
-        .address-input {
-            width: 150px;
-        }        /* Stile per il riquadro del codice */
+        /* Stile per il riquadro del codice */
         .code-block {
             background-color: #1a1a1a; /* Colore più scuro per il riquadro del codice */
             padding: 10px;
@@ -201,8 +132,6 @@
             background-color: #5a5a5a;
         }
 
-
-        /* Chat Input Area */
         .chat-input-area {
             display: flex;
             padding: 7px;
@@ -243,16 +172,50 @@
             background-color: #5a5a5a;
         }
 
-        /* Resize Handle */
-        .resize-handle {
+        /* Model and Address selectors */
+        .control-selectors {
             position: absolute;
-            bottom: 0;
-            right: 0;
-            width: 5px;
-            height: 5px;
-            background-color: #4a4a4a;
-            cursor: se-resize; /* Cambia il cursore per indicare il ridimensionamento */
-            border-top-left-radius: 2px;
+            top: -40px;
+            right: 7px;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .control-selectors label {
+            font-size: 0.8rem;
+            color: #ffffff;
+        }
+
+        .control-selectors select,
+        .control-selectors input {
+            padding: 5px 10px;
+            border: 2px solid #4a4a4a;
+            border-radius: 8px;
+            background-color: #2a2a2a;
+            color: #ffffff;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+        }
+
+        .control-selectors select {
+            cursor: pointer;
+        }
+
+        .control-selectors select:hover,
+        .control-selectors input:hover {
+            border-color: #5a5a5a;
+        }
+
+        .control-selectors select:focus,
+        .control-selectors input:focus {
+            outline: none;
+            border-color: #6a6a6a;
+        }
+
+        .address-input {
+            width: 150px;
         }
 
         /* Animations */
@@ -266,33 +229,70 @@
                 transform: translateY(0);
             }
         }
+
+        /* Scrollbar Styling */
+        .chat-messages::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .chat-messages::-webkit-scrollbar-track {
+            background: #2a2a2a;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: #4a4a4a;
+            border-radius: 10px;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb:hover {
+            background: #5a5a5a;
+        }
+
+        /* Code block scrollbar */
+        .code-block::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .code-block::-webkit-scrollbar-track {
+            background: #1a1a1a;
+        }
+
+        .code-block::-webkit-scrollbar-thumb {
+            background: #4a4a4a;
+            border-radius: 3px;
+        }
+
+        /* Resize Handle */
+        .resize-handle {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 5px;
+            height: 5px;
+            background-color: #4a4a4a;
+            cursor: se-resize; /* Cambia il cursore per indicare il ridimensionamento */
+            border-top-left-radius: 2px;
+        }
     </style>
 </head>
 <body>
     <div class="chat-container">
-        <div class="chat-header">
-            <button id="open-settings">Settings</button>
-        </div>
+        <div class="chat-header"></div>
         <div class="chat-messages" id="chat"></div>
         <div class="chat-input-area">
             <input type="text" id="input" placeholder="Type your message...">
             <button id="send">Send</button>
+            <div class="control-selectors">
+                <label for="model-select">Model:</label>
+                <select id="model-select">
+                    <!-- Models will be dynamically populated from the server -->
+                </select>
+                <label for="address-input">Address:</label>
+                <input type="text" id="address-input" class="address-input" placeholder="Enter address...">
+            </div>
+            
         </div>
-        <div class="resize-handle"></div>
-    </div>
-
-    <!-- Settings Window -->
-    <div class="settings-window" id="settings-window">
-        <button class="settings-close" id="close-settings">&times;</button>
-        <div class="settings-header">Settings</div>
-        <div class="control-selectors">
-            <label for="model-select">Model:</label>
-            <select id="model-select">
-                <!-- Models will be dynamically populated from the server -->
-            </select>
-            <label for="address-input">Address:</label>
-            <input type="text" id="address-input" class="address-input" placeholder="Enter address...">
-        </div>
+        <div class="resize-handle"></div> <!-- Aggiungi la maniglia di ridimensionamento -->
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.4/socket.io.js"></script>
@@ -302,9 +302,8 @@
         const chat = document.getElementById('chat');
         const input = document.getElementById('input');
         const sendButton = document.getElementById('send');
-        const openSettingsButton = document.getElementById('open-settings');
-        const closeSettingsButton = document.getElementById('close-settings');
-        const settingsWindow = document.getElementById('settings-window');
+        const chatContainer = document.querySelector('.chat-container');
+        const resizeHandle = document.querySelector('.resize-handle');
         const modelSelect = document.getElementById('model-select');
         const addressInput = document.getElementById('address-input');
 
@@ -313,42 +312,105 @@
 
         // Listen for available models from server
         socket.on('available_models', (data) => {
+            // Clear existing options
             modelSelect.innerHTML = '';
             
-            data.models.forEach((model) => {
+            // Add options for each model from the server
+            data.models.forEach((model, index) => {
                 const option = document.createElement('option');
                 option.value = model.id || model;
                 option.textContent = model.name || model;
+                
+                // Set as selected if it's the default model
+                if (data.default_model && (model.id === data.default_model || model === data.default_model)) {
+                    option.selected = true;
+                } else if (index === 0 && !data.default_model) {
+                    // If no default is specified, select the first one
+                    option.selected = true;
+                }
+                
                 modelSelect.appendChild(option);
             });
-
+            
             // Optionally notify about which model is selected initially
             const selectedModel = modelSelect.options[modelSelect.selectedIndex].textContent;
             appendMessage(`Using model: ${selectedModel}`, 'system');
-        });
-
-        // Show settings window
-        openSettingsButton.addEventListener('click', () => {
-            settingsWindow.style.display = 'block';
-        });
-
-        // Close settings window
-        closeSettingsButton.addEventListener('click', () => {
-            settingsWindow.style.display = 'none';
         });
 
         // Send message with selected model and address
         sendButton.addEventListener('click', () => {
             const message = input.value.trim();
             if (message) {
+                // Display your own message immediately
                 appendMessage(message, 'user');
 
+                // Get the selected model and address
                 const selectedModel = modelSelect.value;
                 const address = addressInput.value.trim();
 
-                socket.emit('send_message', { message, model: selectedModel, address: address });
+                // Send message with model and address info
+                socket.emit('send_message', { 
+                    message, 
+                    model: selectedModel,
+                    address: address
+                });
+                
+                input.value = ''; // Clear the input field
+            }
+        });
 
-                input.value = ''; // Clear input field
+        // Send message by pressing Enter key
+        input.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault(); // Prevent form submission
+                const message = input.value.trim();
+                if (message) {
+                    // Display your own message immediately
+                    appendMessage(message, 'user');
+
+                    // Get the selected model and address
+                    const selectedModel = modelSelect.value;
+                    const address = addressInput.value.trim();
+
+                    // Send message with model and address info
+                    socket.emit('send_message', { 
+                        message, 
+                        model: selectedModel,
+                        address: address
+                    });
+                    
+                    input.value = ''; // Clear the input field
+                }
+            }
+        });
+
+        // Model change event
+        modelSelect.addEventListener('click', () => {
+            const selectedModel = modelSelect.options[modelSelect.selectedIndex].textContent;
+            // Notify about model change if needed
+            appendMessage(`Model changed to ${selectedModel}`, 'system');
+            
+            // Inform the server about model change
+            socket.emit('change_model', { 
+                model: modelSelect.value,
+                address: addressInput.value.trim()
+            });
+        });
+
+        // Address change event
+        addressInput.addEventListener('change', () => {
+            const address = addressInput.value.trim();
+            if (address) {
+                // Notify about address change if needed
+                appendMessage(`Address set to ${address}`, 'system');
+                
+                // Inform the server about address change
+                socket.emit('change_address', { 
+                    address: address,
+                    model: modelSelect.value
+
+                });
+                
             }
         });
 
@@ -359,6 +421,7 @@
             }
         });
 
+        // Function to process message and extract code blocks
         function appendMessage(message, sender) {
             const messageElement = document.createElement('div');
             messageElement.classList.add('message', sender);
