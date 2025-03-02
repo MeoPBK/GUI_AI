@@ -37,9 +37,27 @@
             min-width: 300px; /* Larghezza minima */
             min-height: 400px; /* Altezza minima */
         }
+        #open-settings {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #3a3a3a;
+            color: #cccccc;
+            font-size: 0.8rem;
+            border: none;
+            padding: 5px 7px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
 
+        #open-settings:hover {
+            background-color: #5a5a5a;
+            transform: scale(1.1);
+        }
+        
         .chat-header {
-            padding: 10px;
+            padding: 20px;
             background-color: #3a3a3a;
             text-align: right;
             font-size: 0.8rem;
@@ -91,7 +109,7 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 450px;
+            width: 300px;
             background-color: #2a2a2a;
             border-radius: 15px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
@@ -105,17 +123,6 @@
             margin-bottom: 2px;
         }
         
-        .open-settings   {
-            color: #232323;
-            background: transparent;
-            border: none;
-            font-size: 1.5rem;
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            cursor: pointer;
-        }
-
 
         .settings-close {
             color: #000000;
@@ -301,7 +308,7 @@
             <label for="model-select">Model:</label>
             <select id="model-select">
                 <!-- Models will be dynamically populated from the server -->
-            </select>
+            </select><br>
             <label for="address-input">Address:</label>
             <input type="text" id="address-input" class="address-input" placeholder="Enter address...">
         </div>
@@ -348,7 +355,24 @@
         closeSettingsButton.addEventListener('click', () => {
             settingsWindow.style.display = 'none';
         });
+        
 
+        input.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' && !event.shiftKey) {  // Enter without shift key (no line break)
+            const message = input.value.trim();
+            if (message) {
+                appendMessage(message, 'user');
+
+                const selectedModel = modelSelect.value;
+                const address = addressInput.value.trim();
+
+                socket.emit('send_message', { message, model: selectedModel, address: address });
+
+                input.value = ''; // Clear input field
+            }
+
+        }
+        });
         // Send message with selected model and address
         sendButton.addEventListener('click', () => {
             const message = input.value.trim();
