@@ -1,0 +1,62 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Interface</title>
+    <link rel="stylesheet" href="style.css"> <!-- Link to CSS file -->
+</head>
+<body>
+
+    <!-- Chat Container -->
+    <div class="chat-container">
+        <!-- Chat Header with Settings and Roles Buttons -->
+        <div class="chat-header">
+            <button class="settings-button">Settings</button>
+            <button class="roles-button">Roles</button>
+        </div>
+
+        <!-- Chat Content (Placeholder) -->
+        <div class="chat-content">
+            <!-- Content goes here -->
+        </div>
+
+        <!-- Resize Handle -->
+        <div class="resize-handle"></div>
+    </div>
+
+    <!-- Settings Window -->
+    <div class="settings-window">
+        <span class="settings-close">&times;</span>
+        <div class="settings-header">Settings</div>
+        <div class="control-selectors">
+            <label for="selector1">Selector 1</label>
+            <select id="selector1">
+                <option value="option1">Option 1</option>
+                <option value="option2">Option 2</option>
+            </select>
+
+            <label for="input1">Input 1</label>
+            <input type="text" id="input1" />
+        </div>
+    </div>
+
+    <!-- Roles Window -->
+    <div id="roles-window">
+        <span class="settings-close">&times;</span>
+        <div class="settings-header">Select Role</div>
+        <div id="role-list">
+            <label><input type="radio" name="role" value="admin"> Admin</label>
+            <label><input type="radio" name="role" value="user"> User</label>
+        </div>
+    </div>
+
+    <!-- Copy Button and Text -->
+    <div>
+        <div class="copy-text">This is the text to copy.</div>
+        <button class="copy-button">Copy Text</button>
+    </div>
+
+    <script src="script.js"></script> <!-- Link to JS file -->
+</body>
+</html>

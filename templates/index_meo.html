@@ -1,17 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+<head> <!-- GUI WIDGETs (hide) --> 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Scancaroonas Chat</title>
-    <style>
-        /* Modern Reset */
+    <style>        
+        /* MAIN BODY*/
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-
         body {
             font-family: 'Inter', sans-serif;
             background-color: #1e1e1e;
@@ -22,7 +21,6 @@
             height: 100vh;
             overflow: hidden;
         }
-
         .chat-container {
             width: 500px; /* Larghezza iniziale */
             height: 600px; /* Altezza iniziale */
@@ -37,30 +35,12 @@
             min-width: 300px; /* Larghezza minima */
             min-height: 400px; /* Altezza minima */
         }
-
-        #open-settings {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background-color: #3a3a3a;
-            color: #cccccc;
-            font-size: 0.8rem;
-            border: none;
-            padding: 5px 7px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-            #open-settings:hover {
-                background-color: #5a5a5a;
-                transform: scale(1.1);
-            }
-
         .chat-header {
-            padding: 20px;
+            margin-top: 10px;
+            width: 100%; /* Ensures it stretches across the full width */
+            padding: 8px;
             background-color: #3a3a3a;
-            text-align: right;
+            text-align: left;
             font-size: 0.8rem;
             font-weight: bold;
             color: #000000;
@@ -71,14 +51,13 @@
             justify-content: flex-end;
             align-items: center;
         }
-
         .chat-messages {
+            height: calc(100% - 200px); /* Subtracts header height */
             flex: 1;
             padding: 15px;
             overflow-y: auto;
             background-color: #2a2a2a;
         }
-
         .message {
             margin-bottom: 15px;
             padding: 10px 15px;
@@ -101,7 +80,31 @@
                 font-size: 0.9rem;
             }
 
-        /* Settings Window */
+        /* SETTINGS*/
+        .settings-header {
+            font-weight: bold;
+            color: #555555;
+            margin-bottom: 2px;
+        }
+        /*____________Buttons____________________*/
+        #open-settings {
+            top: 10px;
+            right: 10px;
+            background-color: #3a3a3a;
+            color: #cccccc;
+            font-size: 0.8rem;
+            border: none;
+            padding: 5px 7px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+            #open-settings:hover {
+                background-color: #5a5a5a;
+                transform: scale(1.1);
+            }
+        /*____________Settings Window____________*/
         .settings-window {
             display: none; /* Hidden by default */
             position: fixed;
@@ -115,14 +118,6 @@
             padding: 20px;
             z-index: 10;
         }
-
-        .settings-header {
-            font-weight: bold;
-            color: #555555;
-            margin-bottom: 2px;
-        }
-
-
         .settings-close {
             color: #000000;
             background: transparent;
@@ -133,6 +128,23 @@
             right: 10px;
             cursor: pointer;
         }
+        /*___________Roles Buttons____________*/
+        #open-roles {
+            top: 10px;
+            right: 20px;
+            background-color: #3a3a3a;
+            color: #cccccc;
+            font-size: 0.8rem;
+            border: none;
+            padding: 5px 7px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+            #open-roles:hover {
+                background-color: #5a5a5a;
+                transform: scale(1.1);
+            }
 
         .control-selectors {
             margin-top: 10px;
@@ -201,7 +213,7 @@
             text-transform: uppercase;
         }
 
-        /* Pulsante di copia */
+        /* Copz Button */
         .copy-button {
             position: absolute;
             top: 3px;
@@ -288,10 +300,11 @@
         }
     </style>
 </head>
-<body>
+<body> <!-- MAIN BODY STRUCTURE -->
     <div class="chat-container">
         <div class="chat-header">
             <button id="open-settings">Settings</button>
+            <button id="open-roles">Roles</button>
         </div>
         <div class="chat-messages" id="chat"></div>
         <div class="chat-input-area">
@@ -315,19 +328,38 @@
         </div>
     </div>
 
+    <!-- Roles Window -->
+    <div class="settings-window" id="roles-window">
+        <button class="settings-close" id="close-roles">&times;</button>
+        <div class="settings-header">Select Role</div>
+        <div class="control-selectors" id="role-list">
+            <!-- Roles will be dynamically inserted here -->
+        </div>
+    </div>
+
+    <!-- VARIABLES DECLARATION 4 JavaScript -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.4/socket.io.js"></script>
     <script>
         const socket = io();
-
+        // Chat Basics:
         const chat = document.getElementById('chat');
         const input = document.getElementById('input');
         const sendButton = document.getElementById('send');
+        const resizeHandle = document.querySelector('.resize-handle');
+        const chatContainer = document.querySelector('.chat-container');
+        // Setting:
         const openSettingsButton = document.getElementById('open-settings');
         const closeSettingsButton = document.getElementById('close-settings');
         const settingsWindow = document.getElementById('settings-window');
         const modelSelect = document.getElementById('model-select');
         const addressInput = document.getElementById('address-input');
+        // Roles:
+        const openRolesButton = document.getElementById('open-roles');
+        const closeRolesButton = document.getElementById('close-roles');
+        const rolesWindow = document.getElementById('roles-window');
+        const roleList = document.getElementById('role-list');
 
+        //__SETTINGS_WINDOW:___________________________________________________
         // Request available models from server when page loads
         socket.emit('get_available_models');
 
@@ -346,17 +378,14 @@
             const selectedModel = modelSelect.options[modelSelect.selectedIndex].textContent;
             appendMessage(`Using model: ${selectedModel}`, 'system');
         });
-
         // Show settings window
         openSettingsButton.addEventListener('click', () => {
             settingsWindow.style.display = 'block';
         });
-
         // Close settings window
         closeSettingsButton.addEventListener('click', () => {
             settingsWindow.style.display = 'none';
         });
-
 
         input.addEventListener('keydown', (event) => {
             if (event.key === 'Enter' && !event.shiftKey) {  // Enter without shift key (no line break)
@@ -389,13 +418,57 @@
             }
         });
 
+        //__ROLES:_________________________________________________________________________
+        // Open Roles window
+        openRolesButton.addEventListener('click', () => {
+            rolesWindow.style.display = 'block';
+            socket.emit('get_roles'); // Request roles from server
+        });
+        // Close Roles window
+        closeRolesButton.addEventListener('click', () => {
+            rolesWindow.style.display = 'none';
+        });
+
+        let selectedRole = null; // Global variable to store role
+
+        // Listen for available roles from Python
+        socket.on('available_roles', (data) => {
+            roleList.innerHTML = ''; // Clear previous list
+
+            data.roles.forEach((role, index) => {
+                const radio = document.createElement('input');
+                radio.type = 'radio';
+                radio.name = 'role';
+                radio.value = role;
+                radio.id = `role-${index}`;
+
+                // If this role was previously selected, check it
+                if (selectedRole === role) {
+                    radio.checked = true;
+                }
+
+                const label = document.createElement('label');
+                label.htmlFor = `role-${index}`;
+                label.textContent = role;
+
+                radio.addEventListener('change', () => {
+                    selectedRole = role
+                    socket.emit('set_role', { selected_role: role }); // Send selected role to Python
+                });
+
+                roleList.appendChild(radio);
+                roleList.appendChild(label);
+                roleList.appendChild(document.createElement('br'));
+            });
+        });
+
+        //__MESSAGES:______________________________________________________________________
         // Receive message from server
         socket.on('message', (data) => {
             if (data.sender !== 'user') {
                 appendMessage(data.message, data.sender);
             }
         });
-
         function appendMessage(message, sender) {
             const messageElement = document.createElement('div');
             messageElement.classList.add('message', sender);
@@ -496,7 +569,6 @@
                 fallbackCopyToClipboard(text, button);
             }
         }
-
         // Fallback copy method using document.execCommand
         function fallbackCopyToClipboard(text, button) {
             const textarea = document.createElement('textarea');
@@ -530,7 +602,6 @@
                 document.body.removeChild(textarea);
             }
         }
-
         // Resize functionality
         let isResizing = false;
 

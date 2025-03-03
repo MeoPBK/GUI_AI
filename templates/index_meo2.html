@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+<head> 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Scancaroonas Chat</title>
-    <style>
+    <style>        /* ALL Gui */
         /* Modern Reset */
         * {
             margin: 0;
@@ -38,29 +38,12 @@
             min-height: 400px; /* Altezza minima */
         }
 
-        #open-settings {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background-color: #3a3a3a;
-            color: #cccccc;
-            font-size: 0.8rem;
-            border: none;
-            padding: 5px 7px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-            #open-settings:hover {
-                background-color: #5a5a5a;
-                transform: scale(1.1);
-            }
-
         .chat-header {
-            padding: 20px;
+            margin-top = 10px;
+            width: 100%; /* Ensures it stretches across the full width */
+            padding: 8px;
             background-color: #3a3a3a;
-            text-align: right;
+            text-align: left;
             font-size: 0.8rem;
             font-weight: bold;
             color: #000000;
@@ -73,6 +56,7 @@
         }
 
         .chat-messages {
+            height: calc(100% - 200px); /* Subtracts header height */
             flex: 1;
             padding: 15px;
             overflow-y: auto;
@@ -115,14 +99,11 @@
             padding: 20px;
             z-index: 10;
         }
-
         .settings-header {
             font-weight: bold;
             color: #555555;
             margin-bottom: 2px;
         }
-
-
         .settings-close {
             color: #000000;
             background: transparent;
@@ -134,6 +115,70 @@
             cursor: pointer;
         }
 
+        #open-settings {
+            top: 10px;
+            right: 10px;
+            background-color: #3a3a3a;
+            color: #cccccc;
+            font-size: 0.8rem;
+            border: none;
+            padding: 5px 7px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+            #open-settings:hover {
+                background-color: #5a5a5a;
+                transform: scale(1.1);
+            }
+
+        /* Roles Window */
+        .roles-window {
+            display: none; /* Hidden by default */
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            background-color: #2a2a2a;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            z-index: 10;
+        }
+        .roles-header {
+            font-weight: bold;
+            color: #555555;
+            margin-bottom: 2px;
+        }
+        .roles-close {
+            color: #000000;
+            background: transparent;
+            border: none;
+            font-size: 1.5rem;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+        }
+        #open-roles {
+            top: 10px;
+            right: 20px;
+            background-color: #3a3a3a;
+            color: #cccccc;
+            font-size: 0.8rem;
+            border: none;
+            padding: 5px 7px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+            #open-roles:hover {
+                background-color: #5a5a5a;
+                transform: scale(1.1);
+            }
+            
         .control-selectors {
             margin-top: 10px;
         }
@@ -201,7 +246,7 @@
             text-transform: uppercase;
         }
 
-        /* Pulsante di copia */
+        /* Copy Button */
         .copy-button {
             position: absolute;
             top: 3px;
@@ -292,6 +337,7 @@
     <div class="chat-container">
         <div class="chat-header">
             <button id="open-settings">Settings</button>
+            <button id="open-roles">Roles</button>
         </div>
         <div class="chat-messages" id="chat"></div>
         <div class="chat-input-area">
@@ -315,6 +361,18 @@
         </div>
     </div>
 
+    <!-- Roles Window -->
+    <div class="roles-window" id="roles-window">
+        <button class="roles-close" id="close-roles">&times;</button>
+        <div class="settings-header">Roles</div>
+        <div class="control-selectors">
+            <label for="roles-select">Role:</label>
+            <select id="roles-select">
+                <!-- Roles will be dynamically populated from the server -->
+            </select><br>
+        </div>
+    </div>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.4/socket.io.js"></script>
     <script>
         const socket = io();
@@ -324,9 +382,15 @@
         const sendButton = document.getElementById('send');
         const openSettingsButton = document.getElementById('open-settings');
         const closeSettingsButton = document.getElementById('close-settings');
+        const openRolesButton = document.getElementById('open-roles');
+        const closeRolesButton = document.getElementById('close-roles');
         const settingsWindow = document.getElementById('settings-window');
+        const settingsWindow = document.getElementById('roles-window');
         const modelSelect = document.getElementById('model-select');
+        const modelSelect = document.getElementById('roles-select');
         const addressInput = document.getElementById('address-input');
+
+        // SETTINGS:__________________________________________________________
 
         // Request available models from server when page loads
         socket.emit('get_available_models');
@@ -357,6 +421,32 @@
             settingsWindow.style.display = 'none';
         });
 
+        // ROLES: ___________________________________________________
+
+        // Listen for available roles from list ---  to be implemented
+        socket.on('available_roles', (data) => {
+            roleSelect.innerHTML = '';
+
+            data.models.forEach((role) => {
+                const option = document.createElement('option');
+                option.value = role.id || role;
+                option.textContent = role.name || role;
+                roleSelect.appendChild(option);
+            });
+
+            // Optionally notify about which model is selected initially
+            const selectedRole = roleSelect.options[roleSelect.selectedIndex].textContent;
+            appendMessage(`Using role: ${selectedRole}`, 'system');
+        });
+
+        // Show roles window
+        openRolesButton.addEventListener('click', () => {
+            rolesWindow.style.display = 'block';
+        });
+        // Close roles window
+        closeRolesButton.addEventListener('click', () => {
+            rolesWindow.style.display = 'none';
+        });
 
         input.addEventListener('keydown', (event) => {
             if (event.key === 'Enter' && !event.shiftKey) {  // Enter without shift key (no line break)
@@ -365,7 +455,10 @@
                     appendMessage(message, 'user');
 
                     const selectedModel = modelSelect.value;
-                    const address = addressInput.value.trim();
+                    if (addressInput.value)
+                        const address = addressInput.value.trim();
+
+                    else const address = 'None';
 
                     socket.emit('send_message', { message, model: selectedModel, address: address });
 
