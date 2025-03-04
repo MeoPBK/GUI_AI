@@ -280,66 +280,6 @@
             outline: none;
             border-color: #6a6a6a;
         }
-        /* Stile per il riquadro del codice */
-        .code-block {
-            background-color: #1a1a1a; /* Colore più scuro per il riquadro del codice */
-            padding: 10px;
-            border-radius: 8px;
-            margin: 10px 0;
-            font-family: 'Courier New', monospace;
-            font-size: 0.65rem;
-            color: #ffffff;
-            position: relative;
-            width: 90%; /* Larghezza ridotta */
-            white-space: pre; /* Preserve formatting of code */
-            overflow-x: auto; /* Add horizontal scrolling for long code lines */
-        }
-        /* Code block scrollbar */
-        .code-block::-webkit-scrollbar {
-            height: 6px;
-        }
-
-        .code-block::-webkit-scrollbar-track {
-            background: #1a1a1a;
-        }
-
-        .code-block::-webkit-scrollbar-thumb {
-            background: #4a4a4a;
-            border-radius: 3px;
-        }
-                /* Language badge */
-                .language-badge {
-            position: absolute;
-            top: 5px;
-            left: 5px;
-            background-color: #4a4a4a;
-            border: none;
-            border-radius: 5px;
-            color: #ffffff;
-            padding: 2px 6px;
-            font-size: 0.5rem;
-            text-transform: uppercase;
-        }
-
-        /* Pulsante di copia */
-        .copy-button {
-            position: absolute;
-            top: 3px;
-            right: 3px;
-            background-color: #4a4a4a;
-            border: none;
-            border-radius: 4px;
-            color: #ffffff;
-            padding: 3px 6px;
-            cursor: pointer;
-            font-size: 0.65rem;
-            transition: background-color 0.3s ease;
-        }
-
-        .copy-button:hover {
-            background-color: #5a5a5a;
-        }
-
 
         /* Animazioni */
         @keyframes fadeIn {
@@ -496,6 +436,24 @@
             }
         }
         
+        // Aggiungi messaggio alla chat
+        function appendMessage(message, sender, chatId, saveMessage = true) {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message', sender);
+            messageElement.textContent = message;
+            chat.appendChild(messageElement);
+            chat.scrollTop = chat.scrollHeight;
+            
+            // Only save the message if saveMessage is true
+            if (saveMessage && chatMessages[chatId]) {
+                chatMessages[chatId].push({ sender, message });
+                
+                // Aggiorna l'anteprima solo se è un nuovo messaggio
+                if (sender === 'user') {
+                    updateChatPreview(chatId, message);
+                }
+            }
+        }
         
         // Apri una chat specifica
         function openChat(chatId) {
@@ -570,47 +528,47 @@
             return `${randomAdj} ${randomNoun}`;
         }
         
-    // Aggiungi una nuova chat
-    let chatCounter = Object.keys(chatMessages).length; // Inizializza il contatore con il numero di chat esistenti
-    addChatButton.addEventListener('click', () => {
-        // Controlla se è stato raggiunto il limite di chat
-        if (Object.keys(chatMessages).length >= MAX_CHATS) {
-            alert(`Hai raggiunto il limite massimo di ${MAX_CHATS} chat!`);
-            return;
+ // Aggiungi una nuova chat
+let chatCounter = Object.keys(chatMessages).length; // Inizializza il contatore con il numero di chat esistenti
+addChatButton.addEventListener('click', () => {
+    // Controlla se è stato raggiunto il limite di chat
+    if (Object.keys(chatMessages).length >= MAX_CHATS) {
+        alert(`Hai raggiunto il limite massimo di ${MAX_CHATS} chat!`);
+        return;
+    }
+    
+    // Incrementa il contatore per il nuovo ID chat
+    chatCounter++;
+    const newChatId = chatCounter;
+    const chatName = generateChatName();
+    
+    // Crea un elemento chat completo con pulsante di eliminazione
+    const newChat = document.createElement('div');
+    newChat.classList.add('msg');
+    newChat.id = `chat-${newChatId}`;
+    newChat.setAttribute('data-chat-id', newChatId);
+    
+    newChat.innerHTML = `
+        <img class="msg-profile" src="https://via.placeholder.com/40" alt="User">
+        <div class="msg-detail">
+            <div class="msg-username">${chatName} ${newChatId}</div>
+            <div class="msg-message">Nuova conversazione</div>
+        </div>
+        <button class="delete-chat" data-chat-id="${newChatId}">&times;</button>
+    `;
+    
+    // Inizializza i messaggi per la nuova chat
+    chatMessages[newChatId] = [
+        { sender: 'ai', message: `Benvenuto in "${chatName} ${newChatId}"!` }
+    ];
+    
+    // Aggiungi evento di click per aprire la chat
+    newChat.addEventListener('click', (e) => {
+        // Non aprire la chat se è stato cliccato il pulsante di eliminazione
+        if (!e.target.classList.contains('delete-chat')) {
+            openChat(newChatId);
         }
-        
-        // Incrementa il contatore per il nuovo ID chat
-        chatCounter++;
-        const newChatId = chatCounter;
-        const chatName = generateChatName();
-        
-        // Crea un elemento chat completo con pulsante di eliminazione
-        const newChat = document.createElement('div');
-        newChat.classList.add('msg');
-        newChat.id = `chat-${newChatId}`;
-        newChat.setAttribute('data-chat-id', newChatId);
-        
-        newChat.innerHTML = `
-            <img class="msg-profile" src="https://via.placeholder.com/40" alt="User">
-            <div class="msg-detail">
-                <div class="msg-username">${chatName} ${newChatId}</div>
-                <div class="msg-message">Nuova conversazione</div>
-            </div>
-            <button class="delete-chat" data-chat-id="${newChatId}">&times;</button>
-        `;
-        
-        // Inizializza i messaggi per la nuova chat
-        chatMessages[newChatId] = [
-            { sender: 'ai', message: `Benvenuto in "${chatName} ${newChatId}"!` }
-        ];
-        
-        // Aggiungi evento di click per aprire la chat
-        newChat.addEventListener('click', (e) => {
-            // Non aprire la chat se è stato cliccato il pulsante di eliminazione
-            if (!e.target.classList.contains('delete-chat')) {
-                openChat(newChatId);
-            }
-        });
+    });
     
     // Aggiungi evento al pulsante di eliminazione
     const deleteButton = newChat.querySelector('.delete-chat');
@@ -677,285 +635,6 @@
         window.addEventListener('beforeunload', () => {
             saveChatsToStorage();
         });
-
-
-        // Request available models from server when page loads
-        socket.emit('get_available_models');
-
-        // Listen for available models from server
-        socket.on('available_models', (data) => {
-            // Clear existing options
-            modelSelect.innerHTML = '';
-            
-            // Add options for each model from the server
-            data.models.forEach((model, index) => {
-                const option = document.createElement('option');
-                option.value = model.id || model;
-                option.textContent = model.name || model;
-                
-                // Set as selected if it's the default model
-                if (data.default_model && (model.id === data.default_model || model === data.default_model)) {
-                    option.selected = true;
-                } else if (index === 0 && !data.default_model) {
-                    // If no default is specified, select the first one
-                    option.selected = true;
-                }
-                
-                modelSelect.appendChild(option);
-            });
-            
-            // Optionally notify about which model is selected initially
-            const selectedModel = modelSelect.options[modelSelect.selectedIndex].textContent;
-            appendMessage(`Using model: ${selectedModel}`, 'system');
-        });
-
-        // Send message with selected model and address
-        sendButton.addEventListener('click', () => {
-            const message = input.value.trim();
-            if (message) {
-                // Display your own message immediately
-                appendMessage(message, 'user');
-
-                // Get the selected model and address
-                const selectedModel = modelSelect.value;
-                const address = addressInput.value.trim();
-
-                // Send message with model and address info
-                socket.emit('send_message', { 
-                    message, 
-                    model: selectedModel,
-                    address: address
-                });
-                
-                input.value = ''; // Clear the input field
-            }
-        });
-
-        // Send message by pressing Enter key
-        input.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault(); // Prevent form submission
-                const message = input.value.trim();
-                if (message) {
-                    // Display your own message immediately
-                    appendMessage(message, 'user');
-
-                    // Get the selected model and address
-                    const selectedModel = modelSelect.value;
-                    const address = addressInput.value.trim();
-
-                    // Send message with model and address info
-                    socket.emit('send_message', { 
-                        message, 
-                        model: selectedModel,
-                        address: address
-                    });
-                    
-                    input.value = ''; // Clear the input field
-                }
-            }
-        });
-
-        // Model change event
-        modelSelect.addEventListener('click', () => {
-            const selectedModel = modelSelect.options[modelSelect.selectedIndex].textContent;
-            // Notify about model change if needed
-            appendMessage(`Model changed to ${selectedModel}`, 'system');
-            
-            // Inform the server about model change
-            socket.emit('change_model', { 
-                model: modelSelect.value,
-                address: addressInput.value.trim()
-            });
-        });
-
-        // Address change event
-        addressInput.addEventListener('change', () => {
-            const address = addressInput.value.trim();
-            if (address) {
-                // Notify about address change if needed
-                appendMessage(`Address set to ${address}`, 'system');
-                
-                // Inform the server about address change
-                socket.emit('change_address', { 
-                    address: address,
-                    model: modelSelect.value
-
-                });
-                
-            }
-        });
-
-
-            
-        
-
-        // Aggiungi messaggio alla chat
-        function appendMessage(message, sender, chatId, saveMessage = true) {
-            const messageElement = document.createElement('div');
-            messageElement.classList.add('message', sender);
-
-            // Regular expression to match code blocks with any language
-            // Format: ```language ... ``` where language is optional
-            const codeBlockRegex = /```([a-zA-Z0-9]*)\n?([^`]+)```/g;
-            let match;
-            let lastIndex = 0;
-            let hasCodeBlock = false;
-
-            // Process all code blocks in the message
-            while ((match = codeBlockRegex.exec(message)) !== null) {
-                hasCodeBlock = true;
-                
-                // Add text before code block
-                if (match.index > lastIndex) {
-                    const textBefore = message.substring(lastIndex, match.index).trim();
-                    if (textBefore) {
-                        const textElement = document.createElement('div');
-                        textElement.textContent = textBefore;
-                        messageElement.appendChild(textElement);
-                    }
-                }
-
-                // Extract language and code content
-                const language = match[1].trim() || 'code'; // Default to 'code' if no language specified
-                const codeContent = match[2].trim();
-
-                // Create code block
-                const codeBlock = document.createElement('div');
-                codeBlock.classList.add('code-block');
-                codeBlock.setAttribute('data-code', codeContent);
-                codeBlock.textContent = codeContent;
-
-                // Add language badge if specified
-                if (language && language !== 'code') {
-                    const langBadge = document.createElement('span');
-                    langBadge.classList.add('language-badge');
-                    langBadge.textContent = language;
-                    codeBlock.appendChild(langBadge);
-                    
-                    // Add more padding-top to accommodate the language badge
-                    codeBlock.style.paddingTop = '25px';
-                }
-
-                // Add copy button
-                const copyButton = document.createElement('button');
-                copyButton.classList.add('copy-button');
-                copyButton.textContent = 'Copy';
-                copyButton.addEventListener('click', () => {
-                    copyToClipboard(codeContent, copyButton);
-                });
-
-                codeBlock.appendChild(copyButton);
-                messageElement.appendChild(codeBlock);
-
-                // Update last index
-                lastIndex = match.index + match[0].length;
-            }
-
-            // Add any remaining text after the last code block
-            if (lastIndex < message.length) {
-                const textAfter = message.substring(lastIndex).trim();
-                if (textAfter) {
-                    const textElement = document.createElement('div');
-                    textElement.textContent = textAfter;
-                    messageElement.appendChild(textElement);
-                }
-            }
-
-            // If no code blocks were found, just set the text content
-            if (!hasCodeBlock) {
-                messageElement.textContent = message;
-            }
-
-            chat.appendChild(messageElement);
-            chat.scrollTop = chat.scrollHeight;
-
-                // Only save the message if saveMessage is true
-                if (saveMessage && chatMessages[chatId]) {
-                chatMessages[chatId].push({ sender, message });
-                
-                // Aggiorna l'anteprima solo se è un nuovo messaggio
-                if (sender === 'user') {
-                    updateChatPreview(chatId, message);
-                }
-            }
-
-        }
-
-        // Copy to clipboard function
-        function copyToClipboard(text, button) {
-            // Modern clipboard API
-            if (navigator.clipboard) {
-                navigator.clipboard.writeText(text)
-                    .then(() => {
-                        button.textContent = 'Copied!';
-                        setTimeout(() => {
-                            button.textContent = 'Copy';
-                        }, 2000);
-                    })
-                    .catch(err => {
-                        console.error('Failed to copy: ', err);
-                        fallbackCopyToClipboard(text, button);
-                    });
-            } else {
-                // Fallback for browsers that don't support clipboard API
-                fallbackCopyToClipboard(text, button);
-            }
-        }
-
-        // Fallback copy method using document.execCommand
-        function fallbackCopyToClipboard(text, button) {
-            const textarea = document.createElement('textarea');
-            textarea.value = text;
-            textarea.style.position = 'fixed'; // Avoid scrolling to bottom
-            textarea.style.opacity = '0'; // Hide the textarea
-            document.body.appendChild(textarea);
-            textarea.select();
-
-            try {
-                const successful = document.execCommand('copy');
-                if (successful) {
-                    button.textContent = 'Copied!';
-                    setTimeout(() => {
-                        button.textContent = 'Copy';
-                    }, 2000);
-                } else {
-                    console.error('Failed to copy text.');
-                    button.textContent = 'Error!';
-                    setTimeout(() => {
-                        button.textContent = 'Copy';
-                    }, 2000);
-                }
-            } catch (err) {
-                console.error('Failed to copy text: ', err);
-                button.textContent = 'Error!';
-                setTimeout(() => {
-                    button.textContent = 'Copy';
-                }, 2000);
-            } finally {
-                document.body.removeChild(textarea);
-            }
-        }
-
-        // Resize functionality
-        let isResizing = false;
-
-        resizeHandle.addEventListener('mousedown', (e) => {
-            isResizing = true;
-            e.preventDefault(); // Previene il comportamento predefinito
-        });
-
-        window.addEventListener('mousemove', (e) => {
-            if (isResizing) {
-                const newWidth = e.clientX - chatContainer.getBoundingClientRect().left;
-                const newHeight = e.clientY - chatContainer.getBoundingClientRect().top;
-                chatContainer.style.width = `${newWidth}px`;
-                chatContainer.style.height = `${newHeight}px`;
-            }
-        });
-
-        window.addEventListener('mouseup', () => {
-            isResizing = false;
-        });
-    </script></body>
+    </script>
+</body>
 </html>

@@ -5,59 +5,104 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Scancaroonas Chat</title>
     <style>
-        /* Modern Reset */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        /* Importazione del font */
+        @import url("https://fonts.googleapis.com/css?family=Manrope:300,400,500,600,700&display=swap&subset=latin-ext");
 
+        /* Stili di base */
         body {
             font-family: 'Inter', sans-serif;
             background-color: #1e1e1e;
             color: #ffffff;
+            margin: 0;
+            padding: 0;
+        }
+
+        .app {
             display: flex;
-            justify-content: center;
-            align-items: center;
             height: 100vh;
             overflow: hidden;
         }
 
-        .chat-container {
-            width: 500px; /* Larghezza iniziale */
-            height: 600px; /* Altezza iniziale */
+        /* Colonna laterale delle chat */
+        .conversation-area {
+            width: 250px;
             background-color: #2a2a2a;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border-right: 1px solid #444;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        .msg {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .msg:hover {
+            background-color: #484848;
+        }
+
+        .msg-profile {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        .msg-username {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .msg-message {
+            font-size: 12px;
+            color: #ccc;
+        }
+
+        /* Area principale della chat */
+        .chat-area {
+            flex-grow: 1;
             display: flex;
             flex-direction: column;
-            overflow: hidden;
-            resize: both; /* Permette il ridimensionamento */
-            position: relative; /* Necessario per il resize handle */
-            min-width: 300px; /* Larghezza minima */
-            min-height: 400px; /* Altezza minima */
+            background-color: #2a2a2a;
+        }
+
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
         }
 
         .chat-header {
             padding: 10px;
-            background-color: #3a3a3a;
+            background-color: #333;
             text-align: right;
+        }
+
+        #open-settings {
+            background-color: #3a3a3a;
+            color: #cccccc;
             font-size: 0.8rem;
-            font-weight: bold;
-            color: #ffffff;
-            border-bottom: 1px solid #444;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            cursor: move; /* Cambia il cursore per indicare che è trascinabile */
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
+            border: none;
+            padding: 5px 7px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        #open-settings:hover {
+            background-color: #5a5a5a;
+            transform: scale(1.1);
         }
 
         .chat-messages {
             flex: 1;
             padding: 15px;
             overflow-y: auto;
-            background-color: #2a2a2a;
         }
 
         .message {
@@ -66,102 +111,41 @@
             border-radius: 15px;
             max-width: 70%;
             word-wrap: break-word;
-            animation: fadeIn 0.3s ease;
+            background-color: #3a3a3a;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 0.3s ease;
         }
 
         .message.user {
             background-color: #4a4a4a;
             margin-left: auto;
             font-size: 0.9rem;
-
         }
 
         .message.ai {
             background-color: #3a3a3a;
             margin-right: auto;
             font-size: 0.9rem;
-
         }
 
-        /* Stile per il riquadro del codice */
-        .code-block {
-            background-color: #1a1a1a; /* Colore più scuro per il riquadro del codice */
-            padding: 10px;
-            border-radius: 8px;
-            margin: 10px 0;
-            font-family: 'Courier New', monospace;
-            font-size: 0.65rem;
-            color: #ffffff;
-            position: relative;
-            width: 90%; /* Larghezza ridotta */
-            white-space: pre; /* Preserve formatting of code */
-            overflow-x: auto; /* Add horizontal scrolling for long code lines */
-        }
-        /* Code block scrollbar */
-        .code-block::-webkit-scrollbar {
-            height: 6px;
-        }
-
-        .code-block::-webkit-scrollbar-track {
-            background: #1a1a1a;
-        }
-
-        .code-block::-webkit-scrollbar-thumb {
-            background: #4a4a4a;
-            border-radius: 3px;
-        }
-
-        /* Language badge */
-        .language-badge {
-            position: absolute;
-            top: 5px;
-            left: 5px;
-            background-color: #4a4a4a;
-            border: none;
-            border-radius: 5px;
-            color: #ffffff;
-            padding: 2px 6px;
-            font-size: 0.5rem;
-            text-transform: uppercase;
-        }
-
-        /* Pulsante di copia */
-        .copy-button {
-            position: relative;
-            top: 3px;
-            right: 3px;
-            background-color: #4a4a4a;
-            border: none;
-            border-radius: 4px;
-            color: #ffffff;
-            padding: 3px 6px;
-            cursor: pointer;
-            font-size: 0.65rem;
-            transition: background-color 0.3s ease;
-        }
-
-        .copy-button:hover {
-            background-color: #5a5a5a;
-        }
-
+        /* Input area */
         .chat-input-area {
             display: flex;
-            padding: 7px;
-            background-color: #3a3a3a;
-            border-top: 1px solid #444;
-            position: relative;
+            padding: 7px 20px;
+            background-color: #333;
+            align-items: center;
         }
 
         .chat-input-area input {
             flex: 1;
-            padding: 10px;
+            padding: 12px 10px;
             border: 2px solid #4a4a4a;
             border-radius: 10px;
             background-color: #2a2a2a;
             color: #ffffff;
-            font-size: 0.8rem;
-            margin-right: 10px;
+            font-size: 1rem;
+            margin-right: -30px;
+            margin-left: 10.8px;
             transition: border-color 0.3s ease;
         }
 
@@ -170,35 +154,74 @@
             outline: none;
         }
 
-        .chat-input-area button {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 10px;
-            background-color: #4a4a4a;
-            color: #ffffff;
-            font-size: 0.8rem;
+        .chat-input-area svg {
+            color: #ccc;
+            width: 20px;
+            flex-shrink: 0;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .chat-input-area svg:hover {
+            color: #fff;
+        }
+
+        #send {
+            background-color: #3b3b3b;
+            width: 60px;
+            height: 60px;
+            border: 2px solid #4a4a4a;
+            border-radius: 50%;
             cursor: pointer;
             transition: background-color 0.3s ease;
+            color: #ffffff;
+            font-size: 1.2rem;
         }
 
-        .chat-input-area button:hover {
-            background-color: #5a5a5a;
+        #send:hover {
+            background-color: #6a6a6a;
+            transform: scale(1.1);
         }
 
-        /* Model and Address selectors */
-        .control-selectors {
-            position: absolute;
-            top: -40px;
-            right: 7px;
+        /* Finestra delle impostazioni */
+        .settings-window {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            background-color: #2a2a2a;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            padding: 20px;
             z-index: 10;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+        }
+
+        .settings-header {
+            font-weight: bold;
+            color: #555;
+            margin-bottom: 2px;
+        }
+
+        .settings-close {
+            color: #000;
+            background: transparent;
+            border: none;
+            font-size: 1.5rem;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+        }
+
+        .control-selectors {
+            margin-top: 10px;
         }
 
         .control-selectors label {
             font-size: 0.8rem;
-            color: #ffffff;
+            color: #fff;
         }
 
         .control-selectors select,
@@ -207,13 +230,9 @@
             border: 2px solid #4a4a4a;
             border-radius: 8px;
             background-color: #2a2a2a;
-            color: #ffffff;
+            color: #fff;
             font-size: 0.8rem;
             transition: all 0.3s ease;
-        }
-
-        .control-selectors select {
-            cursor: pointer;
         }
 
         .control-selectors select:hover,
@@ -227,11 +246,7 @@
             border-color: #6a6a6a;
         }
 
-        .address-input {
-            width: 150px;
-        }
-
-        /* Animations */
+        /* Animazioni */
         @keyframes fadeIn {
             from {
                 opacity: 0;
@@ -242,70 +257,53 @@
                 transform: translateY(0);
             }
         }
-
-        /* Scrollbar Styling */
-        .chat-messages::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        .chat-messages::-webkit-scrollbar-track {
-            background: #2a2a2a;
-        }
-
-        .chat-messages::-webkit-scrollbar-thumb {
-            background: #4a4a4a;
-            border-radius: 10px;
-        }
-
-        .chat-messages::-webkit-scrollbar-thumb:hover {
-            background: #5a5a5a;
-        }
-
-        /* Code block scrollbar */
-        .code-block::-webkit-scrollbar {
-            height: 6px;
-        }
-
-        .code-block::-webkit-scrollbar-track {
-            background: #1a1a1a;
-        }
-
-        .code-block::-webkit-scrollbar-thumb {
-            background: #4a4a4a;
-            border-radius: 3px;
-        }
-
-        /* Resize Handle */
-        .resize-handle {
-            position: absolute;
-            bottom: 0;
-            right: 0;
-            width: 5px;
-            height: 5px;
-            background-color: #4a4a4a;
-            cursor: se-resize; /* Cambia il cursore per indicare il ridimensionamento */
-            border-top-left-radius: 2px;
-        }
     </style>
 </head>
 <body>
-    <div class="chat-container">
-        <div class="chat-header"></div>
-        <div class="chat-messages" id="chat"></div>
-        <div class="chat-input-area">
-            <input type="text" id="input" placeholder="Type your message...">
-            <button id="send">Send</button>
-            <div class="control-selectors">
-                <label for="model-select">Model:</label>
-                <select id="model-select">
-                    <!-- Models will be dynamically populated from the server -->
-                </select>
-                <label for="address-input">Address:</label>
-                <input type="text" id="address-input" class="address-input" placeholder="Enter address...">
+    <div class="app">
+        <!-- Colonna laterale delle chat -->
+        <div class="conversation-area">
+            <div class="msg">
+                <img class="msg-profile" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/3364143/download+%286%29.png" alt="User">
+                <div class="msg-detail">
+                    <div class="msg-username">Lina Ashma</div>
+                    <div class="msg-message">Migas food truck crucifix vexi</div>
+                </div>
             </div>
-            
+            <!-- Aggiungi altre chat qui -->
         </div>
-        <div class="resize-handle"></div> <!-- Aggiungi la maniglia di ridimensionamento -->
+
+        <!-- Area principale della chat -->
+        <div class="chat-area">
+            <div class="chat-container">
+                <div class="chat-header">
+                    <button id="open-settings">Settings</button>
+                </div>
+                <div class="chat-messages" id="chat"></div>
+                <div class="chat-input-area">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus-circle">
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M12 8v8M8 12h8" />
+                    </svg>
+                    <input type="text" id="input" placeholder="Type your message...">
+                    <button id="send">></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Finestra delle impostazioni -->
+    <div class="settings-window" id="settings-window">
+        <button class="settings-close" id="close-settings">&times;</button>
+        <div class="settings-header">Settings</div>
+        <div class="control-selectors">
+            <label for="model-select">Model:</label>
+            <select id="model-select">
+                <!-- Opzioni dei modelli -->
+            </select><br>
+            <label for="address-input">Address:</label>
+            <input type="text" id="address-input" class="address-input" placeholder="Enter address...">
+        </div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.4/socket.io.js"></script>
@@ -315,8 +313,54 @@
         const chat = document.getElementById('chat');
         const input = document.getElementById('input');
         const sendButton = document.getElementById('send');
-        const chatContainer = document.querySelector('.chat-container');
-        const resizeHandle = document.querySelector('.resize-handle');
+        const openSettingsButton = document.getElementById('open-settings');
+        const closeSettingsButton = document.getElementById('close-settings');
+        const settingsWindow = document.getElementById('settings-window');
+
+        // Apri la finestra delle impostazioni
+        openSettingsButton.addEventListener('click', () => {
+            settingsWindow.style.display = 'block';
+        });
+
+        // Chiudi la finestra delle impostazioni
+        closeSettingsButton.addEventListener('click', () => {
+            settingsWindow.style.display = 'none';
+        });
+
+        // Invia messaggio
+        sendButton.addEventListener('click', () => {
+            const message = input.value.trim();
+            if (message) {
+                appendMessage(message, 'user');
+                socket.emit('send_message', { message });
+                input.value = '';
+            }
+        });
+
+        // Ricevi messaggio
+        socket.on('message', (data) => {
+            if (data.sender !== 'user') {
+                appendMessage(data.message, data.sender);
+            }
+        });
+
+        // Aggiungi messaggio alla chat
+        function appendMessage(message, sender) {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message', sender);
+            messageElement.textContent = message;
+            chat.appendChild(messageElement);
+            chat.scrollTop = chat.scrollHeight;
+        }
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.4/socket.io.js"></script>
+        const socket = io();
+
+        const chat = document.getElementById('chat');
+        const input = document.getElementById('input');
+        const sendButton = document.getElementById('send');
+        const openSettingsButton = document.getElementById('open-settings');
+        const closeSettingsButton = document.getElementById('close-settings');
+        const settingsWindow = document.getElementById('settings-window');
         const modelSelect = document.getElementById('model-select');
         const addressInput = document.getElementById('address-input');
 
@@ -325,105 +369,59 @@
 
         // Listen for available models from server
         socket.on('available_models', (data) => {
-            // Clear existing options
             modelSelect.innerHTML = '';
             
-            // Add options for each model from the server
-            data.models.forEach((model, index) => {
+            data.models.forEach((model) => {
                 const option = document.createElement('option');
                 option.value = model.id || model;
                 option.textContent = model.name || model;
-                
-                // Set as selected if it's the default model
-                if (data.default_model && (model.id === data.default_model || model === data.default_model)) {
-                    option.selected = true;
-                } else if (index === 0 && !data.default_model) {
-                    // If no default is specified, select the first one
-                    option.selected = true;
-                }
-                
                 modelSelect.appendChild(option);
             });
-            
+
             // Optionally notify about which model is selected initially
             const selectedModel = modelSelect.options[modelSelect.selectedIndex].textContent;
             appendMessage(`Using model: ${selectedModel}`, 'system');
         });
 
+        // Show settings window
+        openSettingsButton.addEventListener('click', () => {
+            settingsWindow.style.display = 'block';
+        });
+
+        // Close settings window
+        closeSettingsButton.addEventListener('click', () => {
+            settingsWindow.style.display = 'none';
+        });
+        
+
+        input.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' && !event.shiftKey) {  // Enter without shift key (no line break)
+            const message = input.value.trim();
+            if (message) {
+                appendMessage(message, 'user');
+
+                const selectedModel = modelSelect.value;
+                const address = addressInput.value.trim();
+
+                socket.emit('send_message', { message, model: selectedModel, address: address });
+
+                input.value = ''; // Clear input field
+            }
+
+        }
+        });
         // Send message with selected model and address
         sendButton.addEventListener('click', () => {
             const message = input.value.trim();
             if (message) {
-                // Display your own message immediately
                 appendMessage(message, 'user');
 
-                // Get the selected model and address
                 const selectedModel = modelSelect.value;
                 const address = addressInput.value.trim();
 
-                // Send message with model and address info
-                socket.emit('send_message', { 
-                    message, 
-                    model: selectedModel,
-                    address: address
-                });
-                
-                input.value = ''; // Clear the input field
-            }
-        });
+                socket.emit('send_message', { message, model: selectedModel, address: address });
 
-        // Send message by pressing Enter key
-        input.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault(); // Prevent form submission
-                const message = input.value.trim();
-                if (message) {
-                    // Display your own message immediately
-                    appendMessage(message, 'user');
-
-                    // Get the selected model and address
-                    const selectedModel = modelSelect.value;
-                    const address = addressInput.value.trim();
-
-                    // Send message with model and address info
-                    socket.emit('send_message', { 
-                        message, 
-                        model: selectedModel,
-                        address: address
-                    });
-                    
-                    input.value = ''; // Clear the input field
-                }
-            }
-        });
-
-        // Model change event
-        modelSelect.addEventListener('click', () => {
-            const selectedModel = modelSelect.options[modelSelect.selectedIndex].textContent;
-            // Notify about model change if needed
-            appendMessage(`Model changed to ${selectedModel}`, 'system');
-            
-            // Inform the server about model change
-            socket.emit('change_model', { 
-                model: modelSelect.value,
-                address: addressInput.value.trim()
-            });
-        });
-
-        // Address change event
-        addressInput.addEventListener('change', () => {
-            const address = addressInput.value.trim();
-            if (address) {
-                // Notify about address change if needed
-                appendMessage(`Address set to ${address}`, 'system');
-                
-                // Inform the server about address change
-                socket.emit('change_address', { 
-                    address: address,
-                    model: modelSelect.value
-
-                });
-                
+                input.value = ''; // Clear input field
             }
         });
 
@@ -434,7 +432,6 @@
             }
         });
 
-        // Function to process message and extract code blocks
         function appendMessage(message, sender) {
             const messageElement = document.createElement('div');
             messageElement.classList.add('message', sender);
