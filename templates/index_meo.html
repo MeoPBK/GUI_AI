@@ -1,17 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+<head> <!-- GUI WIDGETs (hide) --> 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Scancaroonas Chat</title>
-    <style>
-        /* Modern Reset */
+    <style>        
+        /* MAIN BODY*/
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-
         body {
             font-family: 'Inter', sans-serif;
             background-color: #1e1e1e;
@@ -22,7 +21,6 @@
             height: 100vh;
             overflow: hidden;
         }
-
         .chat-container {
             width: 500px; /* Larghezza iniziale */
             height: 600px; /* Altezza iniziale */
@@ -37,14 +35,15 @@
             min-width: 300px; /* Larghezza minima */
             min-height: 400px; /* Altezza minima */
         }
-
         .chat-header {
-            padding: 10px;
+            margin-top: 10px;
+            width: 100%; /* Ensures it stretches across the full width */
+            padding: 8px;
             background-color: #3a3a3a;
-            text-align: right;
+            text-align: left;
             font-size: 0.8rem;
             font-weight: bold;
-            color: #ffffff;
+            color: #000000;
             border-bottom: 1px solid #444;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
             cursor: move; /* Cambia il cursore per indicare che è trascinabile */
@@ -52,14 +51,13 @@
             justify-content: flex-end;
             align-items: center;
         }
-
         .chat-messages {
+            height: calc(100% - 200px); /* Subtracts header height */
             flex: 1;
             padding: 15px;
             overflow-y: auto;
             background-color: #2a2a2a;
         }
-
         .message {
             margin-bottom: 15px;
             padding: 10px 15px;
@@ -70,20 +68,122 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
-        .message.user {
-            background-color: #4a4a4a;
-            margin-left: auto;
-            font-size: 0.9rem;
+            .message.user {
+                background-color: #4a4a4a;
+                margin-left: auto;
+                font-size: 0.9rem;
+            }
 
+            .message.ai {
+                background-color: #3a3a3a;
+                margin-right: auto;
+                font-size: 0.9rem;
+            }
+
+        /* SETTINGS*/
+        .settings-header {
+            font-weight: bold;
+            color: #555555;
+            margin-bottom: 2px;
         }
-
-        .message.ai {
+        /*____________Buttons____________________*/
+        #open-settings {
+            top: 10px;
+            right: 10px;
             background-color: #3a3a3a;
-            margin-right: auto;
-            font-size: 0.9rem;
-
+            color: #cccccc;
+            font-size: 0.8rem;
+            border: none;
+            padding: 5px 7px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
 
+            #open-settings:hover {
+                background-color: #5a5a5a;
+                transform: scale(1.1);
+            }
+        /*____________Settings Window____________*/
+        .settings-window {
+            display: none; /* Hidden by default */
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            background-color: #2a2a2a;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            z-index: 10;
+        }
+        .settings-close {
+            color: #000000;
+            background: transparent;
+            border: none;
+            font-size: 1.5rem;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+        }
+        /*___________Roles Buttons____________*/
+        #open-roles {
+            top: 10px;
+            right: 20px;
+            background-color: #3a3a3a;
+            color: #cccccc;
+            font-size: 0.8rem;
+            border: none;
+            padding: 5px 7px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+            #open-roles:hover {
+                background-color: #5a5a5a;
+                transform: scale(1.1);
+            }
+
+        .control-selectors {
+            margin-top: 10px;
+        }
+
+            .control-selectors label {
+                font-size: 0.8rem;
+                color: #ffffff;
+            }
+
+            .control-selectors select,
+            .control-selectors input {
+                padding: 5px 10px;
+                border: 2px solid #4a4a4a;
+                border-radius: 8px;
+                background-color: #2a2a2a;
+                color: #ffffff;
+                font-size: 0.8rem;
+                transition: all 0.3s ease;
+            }
+
+            .control-selectors select {
+                cursor: pointer;
+            }
+
+                .control-selectors select:hover,
+                .control-selectors input:hover {
+                    border-color: #5a5a5a;
+                }
+
+                .control-selectors select:focus,
+                .control-selectors input:focus {
+                    outline: none;
+                    border-color: #6a6a6a;
+                }
+
+        .address-input {
+            width: 150px;
+        }
         /* Stile per il riquadro del codice */
         .code-block {
             background-color: #1a1a1a; /* Colore più scuro per il riquadro del codice */
@@ -97,19 +197,6 @@
             width: 90%; /* Larghezza ridotta */
             white-space: pre; /* Preserve formatting of code */
             overflow-x: auto; /* Add horizontal scrolling for long code lines */
-        }
-        /* Code block scrollbar */
-        .code-block::-webkit-scrollbar {
-            height: 6px;
-        }
-
-        .code-block::-webkit-scrollbar-track {
-            background: #1a1a1a;
-        }
-
-        .code-block::-webkit-scrollbar-thumb {
-            background: #4a4a4a;
-            border-radius: 3px;
         }
 
         /* Language badge */
@@ -126,9 +213,9 @@
             text-transform: uppercase;
         }
 
-        /* Pulsante di copia */
+        /* Copz Button */
         .copy-button {
-            position: relative;
+            position: absolute;
             top: 3px;
             right: 3px;
             background-color: #4a4a4a;
@@ -141,10 +228,12 @@
             transition: background-color 0.3s ease;
         }
 
-        .copy-button:hover {
-            background-color: #5a5a5a;
-        }
+            .copy-button:hover {
+                background-color: #5a5a5a;
+            }
 
+
+        /* Chat Input Area */
         .chat-input-area {
             display: flex;
             padding: 7px;
@@ -153,127 +242,37 @@
             position: relative;
         }
 
-        .chat-input-area input {
-            flex: 1;
-            padding: 10px;
-            border: 2px solid #4a4a4a;
-            border-radius: 10px;
-            background-color: #2a2a2a;
-            color: #ffffff;
-            font-size: 0.8rem;
-            margin-right: 10px;
-            transition: border-color 0.3s ease;
-        }
-
-        .chat-input-area input:focus {
-            border-color: #5a5a5a;
-            outline: none;
-        }
-
-        .chat-input-area button {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 10px;
-            background-color: #4a4a4a;
-            color: #ffffff;
-            font-size: 0.8rem;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        .chat-input-area button:hover {
-            background-color: #5a5a5a;
-        }
-
-        /* Model and Address selectors */
-        .control-selectors {
-            position: absolute;
-            top: -40px;
-            right: 7px;
-            z-index: 10;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .control-selectors label {
-            font-size: 0.8rem;
-            color: #ffffff;
-        }
-
-        .control-selectors select,
-        .control-selectors input {
-            padding: 5px 10px;
-            border: 2px solid #4a4a4a;
-            border-radius: 8px;
-            background-color: #2a2a2a;
-            color: #ffffff;
-            font-size: 0.8rem;
-            transition: all 0.3s ease;
-        }
-
-        .control-selectors select {
-            cursor: pointer;
-        }
-
-        .control-selectors select:hover,
-        .control-selectors input:hover {
-            border-color: #5a5a5a;
-        }
-
-        .control-selectors select:focus,
-        .control-selectors input:focus {
-            outline: none;
-            border-color: #6a6a6a;
-        }
-
-        .address-input {
-            width: 150px;
-        }
-
-        /* Animations */
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
+            .chat-input-area input {
+                flex: 1;
+                padding: 10px;
+                border: 2px solid #4a4a4a;
+                border-radius: 10px;
+                background-color: #2a2a2a;
+                color: #ffffff;
+                font-size: 0.8rem;
+                margin-right: 10px;
+                transition: border-color 0.3s ease;
             }
-            to {
-                opacity: 1;
-                transform: translateY(0);
+
+                .chat-input-area input:focus {
+                    border-color: #5a5a5a;
+                    outline: none;
+                }
+
+            .chat-input-area button {
+                padding: 10px 20px;
+                border: none;
+                border-radius: 10px;
+                background-color: #4a4a4a;
+                color: #ffffff;
+                font-size: 0.8rem;
+                cursor: pointer;
+                transition: background-color 0.3s ease;
             }
-        }
 
-        /* Scrollbar Styling */
-        .chat-messages::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        .chat-messages::-webkit-scrollbar-track {
-            background: #2a2a2a;
-        }
-
-        .chat-messages::-webkit-scrollbar-thumb {
-            background: #4a4a4a;
-            border-radius: 10px;
-        }
-
-        .chat-messages::-webkit-scrollbar-thumb:hover {
-            background: #5a5a5a;
-        }
-
-        /* Code block scrollbar */
-        .code-block::-webkit-scrollbar {
-            height: 6px;
-        }
-
-        .code-block::-webkit-scrollbar-track {
-            background: #1a1a1a;
-        }
-
-        .code-block::-webkit-scrollbar-thumb {
-            background: #4a4a4a;
-            border-radius: 3px;
-        }
+                .chat-input-area button:hover {
+                    background-color: #5a5a5a;
+                }
 
         /* Resize Handle */
         .resize-handle {
@@ -286,155 +285,190 @@
             cursor: se-resize; /* Cambia il cursore per indicare il ridimensionamento */
             border-top-left-radius: 2px;
         }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
     </style>
 </head>
-<body>
+<body> <!-- MAIN BODY STRUCTURE -->
     <div class="chat-container">
-        <div class="chat-header"></div>
+        <div class="chat-header">
+            <button id="open-settings">Settings</button>
+            <button id="open-roles">Roles</button>
+        </div>
         <div class="chat-messages" id="chat"></div>
         <div class="chat-input-area">
             <input type="text" id="input" placeholder="Type your message...">
             <button id="send">Send</button>
-            <div class="control-selectors">
-                <label for="model-select">Model:</label>
-                <select id="model-select">
-                    <!-- Models will be dynamically populated from the server -->
-                </select>
-                <label for="address-input">Address:</label>
-                <input type="text" id="address-input" class="address-input" placeholder="Enter address...">
-            </div>
-            
         </div>
-        <div class="resize-handle"></div> <!-- Aggiungi la maniglia di ridimensionamento -->
+        <div class="resize-handle"></div>
     </div>
 
+    <!-- Settings Window -->
+    <div class="settings-window" id="settings-window">
+        <button class="settings-close" id="close-settings">&times;</button>
+        <div class="settings-header">Settings</div>
+        <div class="control-selectors">
+            <label for="model-select">Model:</label>
+            <select id="model-select">
+                <!-- Models will be dynamically populated from the server -->
+            </select><br>
+            <label for="address-input">Address:</label>
+            <input type="text" id="address-input" class="address-input" placeholder="Enter address...">
+        </div>
+    </div>
+
+    <!-- Roles Window -->
+    <div class="settings-window" id="roles-window">
+        <button class="settings-close" id="close-roles">&times;</button>
+        <div class="settings-header">Select Role</div>
+        <div class="control-selectors" id="role-list">
+            <!-- Roles will be dynamically inserted here -->
+        </div>
+    </div>
+
+    <!-- VARIABLES DECLARATION 4 JavaScript -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.4/socket.io.js"></script>
     <script>
         const socket = io();
-
+        // Chat Basics:
         const chat = document.getElementById('chat');
         const input = document.getElementById('input');
         const sendButton = document.getElementById('send');
-        const chatContainer = document.querySelector('.chat-container');
         const resizeHandle = document.querySelector('.resize-handle');
+        const chatContainer = document.querySelector('.chat-container');
+        // Setting:
+        const openSettingsButton = document.getElementById('open-settings');
+        const closeSettingsButton = document.getElementById('close-settings');
+        const settingsWindow = document.getElementById('settings-window');
         const modelSelect = document.getElementById('model-select');
         const addressInput = document.getElementById('address-input');
+        // Roles:
+        const openRolesButton = document.getElementById('open-roles');
+        const closeRolesButton = document.getElementById('close-roles');
+        const rolesWindow = document.getElementById('roles-window');
+        const roleList = document.getElementById('role-list');
 
+        //__SETTINGS_WINDOW:___________________________________________________
         // Request available models from server when page loads
         socket.emit('get_available_models');
 
         // Listen for available models from server
         socket.on('available_models', (data) => {
-            // Clear existing options
             modelSelect.innerHTML = '';
-            
-            // Add options for each model from the server
-            data.models.forEach((model, index) => {
+
+            data.models.forEach((model) => {
                 const option = document.createElement('option');
                 option.value = model.id || model;
                 option.textContent = model.name || model;
-                
-                // Set as selected if it's the default model
-                if (data.default_model && (model.id === data.default_model || model === data.default_model)) {
-                    option.selected = true;
-                } else if (index === 0 && !data.default_model) {
-                    // If no default is specified, select the first one
-                    option.selected = true;
-                }
-                
                 modelSelect.appendChild(option);
             });
-            
+
             // Optionally notify about which model is selected initially
             const selectedModel = modelSelect.options[modelSelect.selectedIndex].textContent;
             appendMessage(`Using model: ${selectedModel}`, 'system');
         });
+        // Show settings window
+        openSettingsButton.addEventListener('click', () => {
+            settingsWindow.style.display = 'block';
+        });
+        // Close settings window
+        closeSettingsButton.addEventListener('click', () => {
+            settingsWindow.style.display = 'none';
+        });
 
+        input.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' && !event.shiftKey) {  // Enter without shift key (no line break)
+                const message = input.value.trim();
+                if (message) {
+                    appendMessage(message, 'user');
+
+                    const selectedModel = modelSelect.value;
+                    const address = addressInput.value.trim();
+
+                    socket.emit('send_message', { message, model: selectedModel, address: address });
+
+                    input.value = ''; // Clear input field
+                }
+
+            }
+        });
         // Send message with selected model and address
         sendButton.addEventListener('click', () => {
             const message = input.value.trim();
             if (message) {
-                // Display your own message immediately
                 appendMessage(message, 'user');
 
-                // Get the selected model and address
                 const selectedModel = modelSelect.value;
                 const address = addressInput.value.trim();
 
-                // Send message with model and address info
-                socket.emit('send_message', { 
-                    message, 
-                    model: selectedModel,
-                    address: address
-                });
-                
-                input.value = ''; // Clear the input field
+                socket.emit('send_message', { message, model: selectedModel, address: address });
+
+                input.value = ''; // Clear input field
             }
         });
 
-        // Send message by pressing Enter key
-        input.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault(); // Prevent form submission
-                const message = input.value.trim();
-                if (message) {
-                    // Display your own message immediately
-                    appendMessage(message, 'user');
+        //__ROLES:_________________________________________________________________________
+        // Open Roles window
+        openRolesButton.addEventListener('click', () => {
+            rolesWindow.style.display = 'block';
+            socket.emit('get_roles'); // Request roles from server
+        });
+        // Close Roles window
+        closeRolesButton.addEventListener('click', () => {
+            rolesWindow.style.display = 'none';
+        });
 
-                    // Get the selected model and address
-                    const selectedModel = modelSelect.value;
-                    const address = addressInput.value.trim();
+        let selectedRole = null; // Global variable to store role
 
-                    // Send message with model and address info
-                    socket.emit('send_message', { 
-                        message, 
-                        model: selectedModel,
-                        address: address
-                    });
-                    
-                    input.value = ''; // Clear the input field
+        // Listen for available roles from Python
+        socket.on('available_roles', (data) => {
+            roleList.innerHTML = ''; // Clear previous list
+
+            data.roles.forEach((role, index) => {
+                const radio = document.createElement('input');
+                radio.type = 'radio';
+                radio.name = 'role';
+                radio.value = role;
+                radio.id = `role-${index}`;
+
+                // If this role was previously selected, check it
+                if (selectedRole === role) {
+                    radio.checked = true;
                 }
-            }
-        });
 
-        // Model change event
-        modelSelect.addEventListener('click', () => {
-            const selectedModel = modelSelect.options[modelSelect.selectedIndex].textContent;
-            // Notify about model change if needed
-            appendMessage(`Model changed to ${selectedModel}`, 'system');
-            
-            // Inform the server about model change
-            socket.emit('change_model', { 
-                model: modelSelect.value,
-                address: addressInput.value.trim()
+                const label = document.createElement('label');
+                label.htmlFor = `role-${index}`;
+                label.textContent = role;
+
+                radio.addEventListener('change', () => {
+                    selectedRole = role
+                    socket.emit('set_role', { selected_role: role }); // Send selected role to Python
+                });
+
+                roleList.appendChild(radio);
+                roleList.appendChild(label);
+                roleList.appendChild(document.createElement('br'));
             });
         });
 
-        // Address change event
-        addressInput.addEventListener('change', () => {
-            const address = addressInput.value.trim();
-            if (address) {
-                // Notify about address change if needed
-                appendMessage(`Address set to ${address}`, 'system');
-                
-                // Inform the server about address change
-                socket.emit('change_address', { 
-                    address: address,
-                    model: modelSelect.value
-
-                });
-                
-            }
-        });
-
+        //__MESSAGES:______________________________________________________________________
         // Receive message from server
         socket.on('message', (data) => {
             if (data.sender !== 'user') {
                 appendMessage(data.message, data.sender);
             }
         });
-
-        // Function to process message and extract code blocks
         function appendMessage(message, sender) {
             const messageElement = document.createElement('div');
             messageElement.classList.add('message', sender);
@@ -449,7 +483,7 @@
             // Process all code blocks in the message
             while ((match = codeBlockRegex.exec(message)) !== null) {
                 hasCodeBlock = true;
-                
+
                 // Add text before code block
                 if (match.index > lastIndex) {
                     const textBefore = message.substring(lastIndex, match.index).trim();
@@ -476,7 +510,7 @@
                     langBadge.classList.add('language-badge');
                     langBadge.textContent = language;
                     codeBlock.appendChild(langBadge);
-                    
+
                     // Add more padding-top to accommodate the language badge
                     codeBlock.style.paddingTop = '25px';
                 }
@@ -535,7 +569,6 @@
                 fallbackCopyToClipboard(text, button);
             }
         }
-
         // Fallback copy method using document.execCommand
         function fallbackCopyToClipboard(text, button) {
             const textarea = document.createElement('textarea');
@@ -569,7 +602,6 @@
                 document.body.removeChild(textarea);
             }
         }
-
         // Resize functionality
         let isResizing = false;
 
