@@ -4,553 +4,86 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Scancaroonas Chat</title>
-    <style>
-        /* Modern Reset */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+    <link rel="stylesheet" type="text/css" href="..\static\style.css">
+    <link rel="shortcut icon" type="image/jpg" href="https://html.sammy-codes.com/images/small-profile.jpeg"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism-tomorrow.min.css" rel="stylesheet" />
 
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #1e1e1e;
-            color: #ffffff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            overflow: hidden;
-        }
-
-        .chat-container {
-            width: 500px; /* Larghezza iniziale */
-            height: 600px; /* Altezza iniziale */
-            background-color: #2a2a2a;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            resize: both; /* Permette il ridimensionamento */
-            position: relative; /* Necessario per il resize handle */
-            min-width: 300px; /* Larghezza minima */
-            min-height: 400px; /* Altezza minima */
-        }
-
-        #open-settings {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background-color: #3a3a3a;
-            color: #cccccc;
-            font-size: 0.8rem;
-            border: none;
-            padding: 5px 7px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-            #open-settings:hover {
-                background-color: #5a5a5a;
-                transform: scale(1.1);
-            }
-
-        .chat-header {
-            padding: 20px;
-            background-color: #3a3a3a;
-            text-align: right;
-            font-size: 0.8rem;
-            font-weight: bold;
-            color: #000000;
-            border-bottom: 1px solid #444;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            cursor: move; /* Cambia il cursore per indicare che è trascinabile */
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-        }
-
-        .chat-messages {
-            flex: 1;
-            padding: 15px;
-            overflow-y: auto;
-            background-color: #2a2a2a;
-        }
-
-        .message {
-            margin-bottom: 15px;
-            padding: 10px 15px;
-            border-radius: 15px;
-            max-width: 70%;
-            word-wrap: break-word;
-            animation: fadeIn 0.3s ease;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-            .message.user {
-                background-color: #4a4a4a;
-                margin-left: auto;
-                font-size: 0.9rem;
-            }
-
-            .message.ai {
-                background-color: #3a3a3a;
-                margin-right: auto;
-                font-size: 0.9rem;
-            }
-
-        /* Settings Window */
-        .settings-window {
-            display: none; /* Hidden by default */
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 300px;
-            background-color: #2a2a2a;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            padding: 20px;
-            z-index: 10;
-        }
-
-        .settings-header {
-            font-weight: bold;
-            color: #555555;
-            margin-bottom: 2px;
-        }
-
-
-        .settings-close {
-            color: #000000;
-            background: transparent;
-            border: none;
-            font-size: 1.5rem;
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            cursor: pointer;
-        }
-
-        .control-selectors {
-            margin-top: 10px;
-        }
-
-            .control-selectors label {
-                font-size: 0.8rem;
-                color: #ffffff;
-            }
-
-            .control-selectors select,
-            .control-selectors input {
-                padding: 5px 10px;
-                border: 2px solid #4a4a4a;
-                border-radius: 8px;
-                background-color: #2a2a2a;
-                color: #ffffff;
-                font-size: 0.8rem;
-                transition: all 0.3s ease;
-            }
-
-            .control-selectors select {
-                cursor: pointer;
-            }
-
-                .control-selectors select:hover,
-                .control-selectors input:hover {
-                    border-color: #5a5a5a;
-                }
-
-                .control-selectors select:focus,
-                .control-selectors input:focus {
-                    outline: none;
-                    border-color: #6a6a6a;
-                }
-
-        .address-input {
-            width: 150px;
-        }
-        /* Stile per il riquadro del codice */
-        .code-block {
-            background-color: #1a1a1a; /* Colore più scuro per il riquadro del codice */
-            padding: 10px;
-            border-radius: 8px;
-            margin: 10px 0;
-            font-family: 'Courier New', monospace;
-            font-size: 0.65rem;
-            color: #ffffff;
-            position: relative;
-            width: 90%; /* Larghezza ridotta */
-            white-space: pre; /* Preserve formatting of code */
-            overflow-x: auto; /* Add horizontal scrolling for long code lines */
-        }
-
-        /* Language badge */
-        .language-badge {
-            position: absolute;
-            top: 5px;
-            left: 5px;
-            background-color: #4a4a4a;
-            border: none;
-            border-radius: 5px;
-            color: #ffffff;
-            padding: 2px 6px;
-            font-size: 0.5rem;
-            text-transform: uppercase;
-        }
-
-        /* Pulsante di copia */
-        .copy-button {
-            position: absolute;
-            top: 3px;
-            right: 3px;
-            background-color: #4a4a4a;
-            border: none;
-            border-radius: 4px;
-            color: #ffffff;
-            padding: 3px 6px;
-            cursor: pointer;
-            font-size: 0.65rem;
-            transition: background-color 0.3s ease;
-        }
-
-            .copy-button:hover {
-                background-color: #5a5a5a;
-            }
-
-
-        /* Chat Input Area */
-        .chat-input-area {
-            display: flex;
-            padding: 7px;
-            background-color: #3a3a3a;
-            border-top: 1px solid #444;
-            position: relative;
-        }
-
-            .chat-input-area input {
-                flex: 1;
-                padding: 10px;
-                border: 2px solid #4a4a4a;
-                border-radius: 10px;
-                background-color: #2a2a2a;
-                color: #ffffff;
-                font-size: 0.8rem;
-                margin-right: 10px;
-                transition: border-color 0.3s ease;
-            }
-
-                .chat-input-area input:focus {
-                    border-color: #5a5a5a;
-                    outline: none;
-                }
-
-            .chat-input-area button {
-                padding: 10px 20px;
-                border: none;
-                border-radius: 10px;
-                background-color: #4a4a4a;
-                color: #ffffff;
-                font-size: 0.8rem;
-                cursor: pointer;
-                transition: background-color 0.3s ease;
-            }
-
-                .chat-input-area button:hover {
-                    background-color: #5a5a5a;
-                }
-
-        /* Resize Handle */
-        .resize-handle {
-            position: absolute;
-            bottom: 0;
-            right: 0;
-            width: 5px;
-            height: 5px;
-            background-color: #4a4a4a;
-            cursor: se-resize; /* Cambia il cursore per indicare il ridimensionamento */
-            border-top-left-radius: 2px;
-        }
-
-        /* Animations */
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-    </style>
 </head>
 <body>
-    <div class="chat-container">
-        <div class="chat-header">
-            <button id="open-settings">Settings</button>
-        </div>
-        <div class="chat-messages" id="chat"></div>
-        <div class="chat-input-area">
-            <input type="text" id="input" placeholder="Type your message...">
-            <button id="send">Send</button>
-        </div>
-        <div class="resize-handle"></div>
-    </div>
+    <div class="app">
+        <!-- Colonna laterale delle chat -->
+        <div class="conversation-area">
+            <!-- Pulsante "Aggiungi chat" -->
+            <button class="add-chat" id="add-chat">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10" />
+                    <path d="M12 8v8M8 12h8" />
+                </svg>
+            </button>
 
-    <!-- Settings Window -->
-    <div class="settings-window" id="settings-window">
-        <button class="settings-close" id="close-settings">&times;</button>
-        <div class="settings-header">Settings</div>
-        <div class="control-selectors">
-            <label for="model-select">Model:</label>
-            <select id="model-select">
-                <!-- Models will be dynamically populated from the server -->
-            </select><br>
-            <label for="address-input">Address:</label>
-            <input type="text" id="address-input" class="address-input" placeholder="Enter address...">
+            <!-- Chat esistenti -->
+            <div class="msg active" id="chat-1" data-chat-id="1">
+                <div class="msg-detail">
+                    <div class="msg-username">Nome del modello</div>
+                    <div class="msg-message">Migas food truck crucifix vexi</div>
+                </div>
+            </div>
+            <!-- Altre chat verranno aggiunte qui dinamicamente -->
+        </div>
+
+        <!-- Area principale della chat -->
+        <div class="chat-area">
+            <div class="chat-container">
+
+                <div class="chat-header">
+                    <button id="open-conversations">C</button>
+                    <div class="chat-header-title">Nome del modello</div>
+                    <button id="open-settings">S</button>
+                </div>
+                <div class="chat-messages" id="chat">
+                <div class="messages-container"></div></div>
+                
+            <div class="chat-input-area">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus-circle">
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M12 8v8M8 12h8" />
+                    </svg>
+                    <input type="text" id="input" placeholder="Type your message...">
+                    <button id="send">></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Finestra delle impostazioni -->
+        <div class="settings-window" id="settings-window">
+            <div class="settings-header">Settings</div><br>
+            <div class="control-selectors">
+                <label for="model-select">Model:</label>
+                <select id="model-select">
+                    <!-- Opzioni dei modelli -->
+                </select><br>
+                <label for="address-input">Address:</label>
+                <input type="text" id="address-input" class="address-input" placeholder="Enter address..."><br>
+                <label for="address-input">Temperature:</label>
+                <input type="text" id="temperature-input" class="temperature-input" placeholder="Enter temperature..."><br>
+                <label for="context-input">Context Length:</label>
+                <input type="text" id="context-input" class="context-input" placeholder="50 messages...">
+            </div><br>
+            
+            <div class="settings-header">Select Role</div>
+            <div class="control-selectors" id="role-list">
+                <label for="role-list">Role:</label>
+                <select id="role-list">
+                    <!-- Opzioni dei ruoli -->
+                </select><br>
+            </div>
         </div>
     </div>
-
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-javascript.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.4/socket.io.js"></script>
-    <script>
-        const socket = io();
-
-        const chat = document.getElementById('chat');
-        const input = document.getElementById('input');
-        const sendButton = document.getElementById('send');
-        const openSettingsButton = document.getElementById('open-settings');
-        const closeSettingsButton = document.getElementById('close-settings');
-        const settingsWindow = document.getElementById('settings-window');
-        const modelSelect = document.getElementById('model-select');
-        const addressInput = document.getElementById('address-input');
-
-        // Request available models from server when page loads
-        socket.emit('get_available_models');
-
-        // Listen for available models from server
-        socket.on('available_models', (data) => {
-            modelSelect.innerHTML = '';
-
-            data.models.forEach((model) => {
-                const option = document.createElement('option');
-                option.value = model.id || model;
-                option.textContent = model.name || model;
-                modelSelect.appendChild(option);
-            });
-
-            // Optionally notify about which model is selected initially
-            const selectedModel = modelSelect.options[modelSelect.selectedIndex].textContent;
-            appendMessage(`Using model: ${selectedModel}`, 'system');
-        });
-
-        // Show settings window
-        openSettingsButton.addEventListener('click', () => {
-            settingsWindow.style.display = 'block';
-        });
-
-        // Close settings window
-        closeSettingsButton.addEventListener('click', () => {
-            settingsWindow.style.display = 'none';
-        });
-
-
-        input.addEventListener('keydown', (event) => {
-            if (event.key === 'Enter' && !event.shiftKey) {  // Enter without shift key (no line break)
-                const message = input.value.trim();
-                if (message) {
-                    appendMessage(message, 'user');
-
-                    const selectedModel = modelSelect.value;
-                    const address = addressInput.value.trim();
-
-                    socket.emit('send_message', { message, model: selectedModel, address: address });
-
-                    input.value = ''; // Clear input field
-                }
-
-            }
-        });
-        // Send message with selected model and address
-        sendButton.addEventListener('click', () => {
-            const message = input.value.trim();
-            if (message) {
-                appendMessage(message, 'user');
-
-                const selectedModel = modelSelect.value;
-                const address = addressInput.value.trim();
-
-                socket.emit('send_message', { message, model: selectedModel, address: address });
-
-                input.value = ''; // Clear input field
-            }
-        });
-
-        // Receive message from server
-        socket.on('message', (data) => {
-            if (data.sender !== 'user') {
-                appendMessage(data.message, data.sender);
-            }
-        });
-
-        function appendMessage(message, sender) {
-            const messageElement = document.createElement('div');
-            messageElement.classList.add('message', sender);
-
-            // Regular expression to match code blocks with any language
-            // Format: ```language ... ``` where language is optional
-            const codeBlockRegex = /```([a-zA-Z0-9]*)\n?([^`]+)```/g;
-            let match;
-            let lastIndex = 0;
-            let hasCodeBlock = false;
-
-            // Process all code blocks in the message
-            while ((match = codeBlockRegex.exec(message)) !== null) {
-                hasCodeBlock = true;
-
-                // Add text before code block
-                if (match.index > lastIndex) {
-                    const textBefore = message.substring(lastIndex, match.index).trim();
-                    if (textBefore) {
-                        const textElement = document.createElement('div');
-                        textElement.textContent = textBefore;
-                        messageElement.appendChild(textElement);
-                    }
-                }
-
-                // Extract language and code content
-                const language = match[1].trim() || 'code'; // Default to 'code' if no language specified
-                const codeContent = match[2].trim();
-
-                // Create code block
-                const codeBlock = document.createElement('div');
-                codeBlock.classList.add('code-block');
-                codeBlock.setAttribute('data-code', codeContent);
-                codeBlock.textContent = codeContent;
-
-                // Add language badge if specified
-                if (language && language !== 'code') {
-                    const langBadge = document.createElement('span');
-                    langBadge.classList.add('language-badge');
-                    langBadge.textContent = language;
-                    codeBlock.appendChild(langBadge);
-
-                    // Add more padding-top to accommodate the language badge
-                    codeBlock.style.paddingTop = '25px';
-                }
-
-                // Add copy button
-                const copyButton = document.createElement('button');
-                copyButton.classList.add('copy-button');
-                copyButton.textContent = 'Copy';
-                copyButton.addEventListener('click', () => {
-                    copyToClipboard(codeContent, copyButton);
-                });
-
-                codeBlock.appendChild(copyButton);
-                messageElement.appendChild(codeBlock);
-
-                // Update last index
-                lastIndex = match.index + match[0].length;
-            }
-
-            // Add any remaining text after the last code block
-            if (lastIndex < message.length) {
-                const textAfter = message.substring(lastIndex).trim();
-                if (textAfter) {
-                    const textElement = document.createElement('div');
-                    textElement.textContent = textAfter;
-                    messageElement.appendChild(textElement);
-                }
-            }
-
-            // If no code blocks were found, just set the text content
-            if (!hasCodeBlock) {
-                messageElement.textContent = message;
-            }
-
-            chat.appendChild(messageElement);
-            chat.scrollTop = chat.scrollHeight;
-        }
-
-        // Copy to clipboard function
-        function copyToClipboard(text, button) {
-            // Modern clipboard API
-            if (navigator.clipboard) {
-                navigator.clipboard.writeText(text)
-                    .then(() => {
-                        button.textContent = 'Copied!';
-                        setTimeout(() => {
-                            button.textContent = 'Copy';
-                        }, 2000);
-                    })
-                    .catch(err => {
-                        console.error('Failed to copy: ', err);
-                        fallbackCopyToClipboard(text, button);
-                    });
-            } else {
-                // Fallback for browsers that don't support clipboard API
-                fallbackCopyToClipboard(text, button);
-            }
-        }
-
-        // Fallback copy method using document.execCommand
-        function fallbackCopyToClipboard(text, button) {
-            const textarea = document.createElement('textarea');
-            textarea.value = text;
-            textarea.style.position = 'fixed'; // Avoid scrolling to bottom
-            textarea.style.opacity = '0'; // Hide the textarea
-            document.body.appendChild(textarea);
-            textarea.select();
-
-            try {
-                const successful = document.execCommand('copy');
-                if (successful) {
-                    button.textContent = 'Copied!';
-                    setTimeout(() => {
-                        button.textContent = 'Copy';
-                    }, 2000);
-                } else {
-                    console.error('Failed to copy text.');
-                    button.textContent = 'Error!';
-                    setTimeout(() => {
-                        button.textContent = 'Copy';
-                    }, 2000);
-                }
-            } catch (err) {
-                console.error('Failed to copy text: ', err);
-                button.textContent = 'Error!';
-                setTimeout(() => {
-                    button.textContent = 'Copy';
-                }, 2000);
-            } finally {
-                document.body.removeChild(textarea);
-            }
-        }
-
-        // Resize functionality
-        let isResizing = false;
-
-        resizeHandle.addEventListener('mousedown', (e) => {
-            isResizing = true;
-            e.preventDefault(); // Previene il comportamento predefinito
-        });
-
-        window.addEventListener('mousemove', (e) => {
-            if (isResizing) {
-                const newWidth = e.clientX - chatContainer.getBoundingClientRect().left;
-                const newHeight = e.clientY - chatContainer.getBoundingClientRect().top;
-                chatContainer.style.width = `${newWidth}px`;
-                chatContainer.style.height = `${newHeight}px`;
-            }
-        });
-
-        window.addEventListener('mouseup', () => {
-            isResizing = false;
-        });
-    </script>
+    <script type="text/javascript" src="..\static\js.js"></script>
 </body>
 </html>
