@@ -34,12 +34,12 @@ OllamaData = {
 class OllamaPOST:
         def __init__(self):
             self.session = requests.Session()  # Persistent session for efficiency
-            self.context = []
-            self.role_flag = 0
-            self.answer = ""
-            self.address = ""
+            self.context = []  
+            self.role_flag = 0      # true: trascription of roles on, false: end of trascription roles, user input now
+            self.answer = ""        # model answer
+            self.address = ""       
             self.model = ""
-            self.role = []
+            self.role = []          # save roles description
             self.max_context_length = MAX_CONTEXT_LEN   # max length of context buffer
             self.role_buffer = len(ROLES_ATTRIBUTE[5])     # length role buffer
 
@@ -182,7 +182,7 @@ class OllamaPOST:
                     snippet = " ".join(topic.get("Text", "") for topic in topics if topic.get("Text"))
                 return snippet
             except Exception as e:
-                raise Exception(f"Error searching DuckDuckGo: {e}")
+                return Exception(f"SYSTEM: Error searching DuckDuckGo: {e}")
         
         # PROVIDER SELECTOR
         def combined_search(self, query, provider=None): #, google_api_key=None, google_cse_id=None, bing_api_key=None):
