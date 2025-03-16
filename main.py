@@ -1,6 +1,6 @@
 from flask import Flask, render_template
 from flask_socketio import SocketIO, send, emit
-from OllamaComm3 import OllamaPOST
+from OllamaComm import OllamaPOST
 import json
 
 ##### INI JSON #####
@@ -29,8 +29,7 @@ def index():
 
 #### MANAGE MESSAGES
 @socketio.on('send_message')
-def handle_send_message(data):
-    """Handle sending a message and getting the model's response."""
+def handle_send_message(data): # Handle sending a message and getting the model's response.
     user_message = data['message']
     Ollama.data['model'] = data.get('model', DEFAULT_MODEL) # direct assignation to json (is it a good idea?)
     Ollama.address = data.get('address', OLLAMA_URL)
@@ -67,7 +66,7 @@ def handle_send_message(data):
             print(Ollama.context)
         except Exception as e:
             # Send error message if response fails
-            error_msg = f"Error getting response from {Ollama.model}: {str(e)}"
+            error_msg = f"Error getting response from {Ollama.data['model']}: {str(e)}"
             send({"sender": "system", "message": error_msg}, broadcast=True)
 
 ########### SETTINGS: ############
@@ -145,7 +144,7 @@ def receive_role(data):
             Ollama.role_index = ROLES.index(selected_role)
             # Store all attributes for the selected role
             Ollama.role_flag = 1
-            # print("role_idx: " + str(role_index))
+            #print("role_idx: " + str(role_index))
             send({"sender": "system", "message": f"Role set to: {selected_role}"}, broadcast=True)
         else:
             send({"sender": "system", "message": "Invalid role selected."}, broadcast=True)
@@ -156,26 +155,25 @@ def receive_role(data):
 @socketio.on('change_context')
 def handle_change_context(data):
     try:
-        Ollama.max_context_length = int(data.get('context_lenght', 50))
+        Ollama.max_context_leng = int(data.get('context_lenght', 50))
         # Send success message
         success_msg = f"Context length set to {Ollama.max_context_length}"
         send({"sender": "system", "message": success_msg}, broadcast=True)
     except Exception as e:
         # Send error message
-        error_msg = f"Context length set to {Ollama.max_context_length}: {str(e)}"
-        send({"sender": "system", "message": error_msg}, broadcast=True)
+        send({"sender": "system", "message": e}, broadcast=True)
 
 #### MANAGE TEMPERATURE
 @socketio.on('change_temp')
 def handle_change_temp(data):
     try:
-        Ollama.OllamaData["temperature"]  = float(data.get('temp', 0.5))
+        Ollama.data["temperature"]  = float(data.get('temp', 0.5))
         # Send success message
-        success_msg = f"temperature length set to {Ollama.OllamaData["temperature"]}"
+        success_msg = f"temperature length set to {Ollama.data["temperature"]}"
         send({"sender": "system", "message": success_msg}, broadcast=True)
     except Exception as e:
         # Send error message
-        error_msg = f"temperature length set to {Ollama.OllamaData["temperature"]}: {str(e)}"
+        error_msg = f"temperature length set to {Ollama.data["temperature"]}: {str(e)}"
         send({"sender": "system", "message": error_msg}, broadcast=True)
 
 if __name__ == '__main__':
