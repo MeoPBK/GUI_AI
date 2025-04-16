@@ -14,3 +14,4 @@ FEATURES:
   - multi-chat GUI, enabling various conversations from various models simultaneously.
   - possibility to transfer the saved chat context from one model to another
   - refined research with different models interconnectivity and interaction.
+  - Editor for Automation and Workflow design including MCP connectivity and built-in ML components.
